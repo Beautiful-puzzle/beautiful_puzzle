@@ -1,4 +1,5 @@
-import 'package:beautiful_puzzle/ui/game/game_field.dart';
+import 'package:beautiful_puzzle/initializer.dart';
+import 'package:beautiful_puzzle/ui/game/field/field.initializer.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -6,12 +7,14 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
+    return Initializer(
+      child: MaterialApp(
+        title: 'Flutter Demo',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+        ),
+        home: const FieldInitializer(),
       ),
-      home: const GameFieldWidget(),
     );
   }
 }

@@ -15,6 +15,9 @@ dependencies:
   animated_gesture_detector: ^1.0.0
   cupertino_icons: ^1.0.2
 
+  # dev
+  rxdart: ^0.27.2
+
 dev_dependencies:
   flutter_lints: ^1.0.0
 
