@@ -44,9 +44,10 @@ class _GameCardState extends State<GameCard> {
 
     final cardSize = GameFieldBloc.of(context).cardSize;
 
-    return Positioned(
-      left:
-          position.dx,
+    return AnimatedPositioned(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.linearToEaseOut,
+      left: position.dx,
       top: position.dy,
       height: cardSize,
       width: cardSize,
@@ -57,7 +58,6 @@ class _GameCardState extends State<GameCard> {
           opacity: 1,
           child: child,
         ),
-        //onDragEnd: (details) => updatePosition(details.offset),
         onDragUpdate: (details) => updatePosition(details.localPosition),
         child: child,
       ),
@@ -66,10 +66,17 @@ class _GameCardState extends State<GameCard> {
 
   void updatePosition(Offset newPosition) {
     final bloc = GameFieldBloc.of(context);
-    final tempHeight = newPosition.dy - (bloc.screenSize.height / 2) +
-        (bloc.fieldSize.height / 8) - (bloc.cardSize / 2);
-    final tempWidth = newPosition.dx - (bloc.screenSize.width / 2) +
-        (bloc.fieldSize.width / 8) - (bloc.cardSize / 2);
+
+    /// margin of game field from screen edge
+    final marginHeight = (bloc.screenSize.height - bloc.fieldSize.height) / 2;
+    final marginWidth = (bloc.screenSize.width - bloc.fieldSize.width) / 2;
+
+    /// so user's pointer be in the center of a card
+    final halfOfButton = bloc.cardSize / 2;
+
+    final tempHeight = -marginHeight - halfOfButton + newPosition.dy;
+    final tempWidth = -marginWidth - halfOfButton + newPosition.dx;
+
     setState(() => position = Offset(tempWidth, tempHeight));
   }
 }

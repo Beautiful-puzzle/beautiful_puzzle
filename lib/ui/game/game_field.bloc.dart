@@ -12,8 +12,8 @@ class GameFieldBloc extends Bloc {
 
   final int rowCount = 5;
   final int colCount = 5;
-  final double margin = 10;
-  final cardSize = 60.0;
+  final double margin = 20;
+  final cardSize = 100.0;
 
   late Size fieldSize;
   late List<Widget> generatedCards;
