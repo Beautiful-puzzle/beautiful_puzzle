@@ -1,13 +1,15 @@
+import 'package:beautiful_puzzle/models/game_card.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
+import 'package:uuid/uuid.dart';
 
 class GameFieldBloc extends Bloc {
-  GameFieldBloc(Widget Function(Offset) card) {
+  GameFieldBloc() {
     fieldSize = Size(colCount * (margin + cardSize) + margin,
         rowCount * (margin + cardSize) + margin);
-    generatedCards = _generateCards(card);
+    _generateCards();
   }
 
   final int rowCount = 5;
@@ -16,21 +18,24 @@ class GameFieldBloc extends Bloc {
   final cardSize = 100.0;
 
   late Size fieldSize;
-  late List<Widget> generatedCards;
   late Size screenSize;
 
   final _isLoading = BehaviorSubject<bool>.seeded(false);
+  final _generatedCards = BehaviorSubject<List<GameCardModel>?>.seeded(null);
 
   ValueStream<bool> get isLoading => _isLoading;
 
-  List<Widget> _generateCards(Widget Function(Offset) card) {
-    final list = <Widget>[];
+  ValueStream<List<GameCardModel>?> get generatedCards => _generatedCards;
+
+  void _generateCards() {
+    final list = <GameCardModel>[];
 
     for (var i = 0; i < rowCount; i++) {
       for (var j = 0; j < colCount; j++) {
         list.add(
-          card(
-            Offset(
+          GameCardModel(
+            id: const Uuid().v1(),
+            offset: Offset(
               i * (cardSize + margin) + margin,
               j * (cardSize + margin) + margin,
             ),
@@ -39,12 +44,24 @@ class GameFieldBloc extends Bloc {
       }
     }
 
-    return list;
+    _generatedCards.add(list);
+  }
+
+  void topOrder(String id) {
+    final item =
+        _generatedCards.value!.firstWhere((element) => element.id == id);
+
+    _generatedCards.add(
+      _generatedCards.value!
+        ..removeWhere((element) => element.id == id)
+        ..add(item),
+    );
   }
 
   @override
   void dispose() {
     _isLoading.close();
+    _generatedCards.close();
     super.dispose();
   }
 

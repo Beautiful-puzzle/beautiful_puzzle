@@ -1,5 +1,4 @@
 import 'package:beautiful_puzzle/ui/game/field/game_field.dart';
-import 'package:beautiful_puzzle/ui/game/game_card.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:flutter/material.dart';
@@ -18,9 +17,7 @@ class _FieldInitializerState extends State<FieldInitializer> {
   Widget build(BuildContext context) {
     return BlocBuilder(
       blocBuilder: () {
-        return GameFieldBloc(
-          (offset) => GameCard(initOffset: offset),
-        );
+        return GameFieldBloc();
       },
       builder: (context, bloc) {
         return const GameFieldWidget();

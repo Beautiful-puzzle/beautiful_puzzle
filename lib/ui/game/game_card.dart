@@ -1,21 +1,24 @@
 import 'dart:async';
 import 'dart:math';
 
-import 'package:animated_gesture_detector/animated_gesture_detector.dart';
+import 'package:beautiful_puzzle/models/game_card.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
 import 'package:flutter/material.dart';
 
 class GameCard extends StatefulWidget {
-  const GameCard({Key? key, required this.initOffset}) : super(key: key);
+  const GameCard({
+    Key? key,
+    required this.card,
+  }) : super(key: key);
 
-  final Offset initOffset;
+  final GameCardModel card;
 
   @override
   _GameCardState createState() => _GameCardState();
 }
 
 class _GameCardState extends State<GameCard> {
-  late var position = Offset.zero;
+  late var position = widget.card.offset;
 
   var randomColor =
       Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
@@ -32,13 +35,11 @@ class _GameCardState extends State<GameCard> {
 
   @override
   Widget build(BuildContext context) {
-    final child = AnimatedGestureDetector(
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 500),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(20.0),
-          color: randomColor,
-        ),
+    final child = AnimatedContainer(
+      duration: const Duration(milliseconds: 500),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(20.0),
+        color: randomColor,
       ),
     );
 
@@ -59,6 +60,7 @@ class _GameCardState extends State<GameCard> {
           child: child,
         ),
         onDragUpdate: (details) => updatePosition(details.localPosition),
+        onDragStarted: () => GameFieldBloc.of(context).topOrder(widget.card.id),
         child: child,
       ),
     );
