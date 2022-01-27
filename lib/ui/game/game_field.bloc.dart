@@ -48,14 +48,14 @@ class GameFieldBloc extends Bloc {
   }
 
   void topOrder(String id) {
-    final item =
+    /*final item =
         _generatedCards.value!.firstWhere((element) => element.id == id);
 
     _generatedCards.add(
       _generatedCards.value!
         ..removeWhere((element) => element.id == id)
         ..add(item),
-    );
+    );*/
   }
 
   @override

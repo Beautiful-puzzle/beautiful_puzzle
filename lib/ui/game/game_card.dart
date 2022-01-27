@@ -25,7 +25,7 @@ class _GameCardState extends State<GameCard> {
 
   @override
   void initState() {
-    Timer.periodic(Duration(seconds: 1), (timer) {
+    Timer.periodic(const Duration(seconds: 1), (timer) {
       randomColor =
           Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
       setState(() {});
@@ -61,6 +61,7 @@ class _GameCardState extends State<GameCard> {
         ),
         onDragUpdate: (details) => updatePosition(details.localPosition),
         onDragStarted: () => GameFieldBloc.of(context).topOrder(widget.card.id),
+        onDragEnd: (_) => setState(() => position = widget.card.offset),
         child: child,
       ),
     );
