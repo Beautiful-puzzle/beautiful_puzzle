@@ -42,9 +42,7 @@ class _GameCardState extends State<GameCard> {
         borderRadius: BorderRadius.circular(20.0),
       ),
       clipBehavior: Clip.hardEdge,
-      child: widget.card.isEmpty
-          ? null
-          : BackdropFilter(
+      child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
               child: Container(
                 color: Colors.white.withOpacity(.5),
@@ -70,18 +68,26 @@ class _GameCardState extends State<GameCard> {
       top: position.dy,
       height: cardSize,
       width: cardSize,
-      child: Draggable(
-        maxSimultaneousDrags: 1,
-        feedback: Container(),
-        childWhenDragging: Opacity(
-          opacity: 1,
-          child: child,
-        ),
-        onDragUpdate: (details) => updatePosition(details.localPosition),
-        onDragStarted: () => GameFieldBloc.of(context).topOrder(widget.card.id),
-        onDragEnd: (_) => setState(() => position = widget.card.offset),
-        child: child,
-      ),
+      child: widget.card.isEmpty
+          ? const SizedBox()
+          : Draggable(
+              maxSimultaneousDrags: 1,
+              feedback: Container(),
+              childWhenDragging: Opacity(
+                opacity: 1,
+                child: child,
+              ),
+              onDragUpdate: (details) => updatePosition(details.localPosition),
+              onDragStarted: () =>
+                  GameFieldBloc.of(context).topOrder(widget.card.id),
+              onDragEnd: (_) => setState(
+                () => position = GameFieldBloc.of(context).swapCardsPositions(
+                  currentPosition: position,
+                  card: widget.card,
+                ),
+              ),
+              child: child,
+            ),
     );
   }
 

@@ -10,7 +10,7 @@ class GameCardModel {
 
   final bool isEmpty;
 
-  final Offset offset;
+  Offset offset;
   final String id;
   final int number;
 }
