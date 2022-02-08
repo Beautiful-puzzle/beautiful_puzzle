@@ -25,7 +25,6 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
         }
 
         return Stack(
-
           children: sList.data!
               .map((e) => GameCard(card: e))
               .toList(),

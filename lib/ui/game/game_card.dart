@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:math';
+import 'dart:ui';
 
 import 'package:beautiful_puzzle/models/game_card.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
@@ -39,8 +40,25 @@ class _GameCardState extends State<GameCard> {
       duration: const Duration(milliseconds: 500),
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(20.0),
-        color: randomColor,
       ),
+      clipBehavior: Clip.hardEdge,
+      child: widget.card.isEmpty
+          ? null
+          : BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+              child: Container(
+                color: Colors.white.withOpacity(.5),
+                child: Center(
+                  child: Text(
+                    '${widget.card.number}',
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 34,
+                    ),
+                  ),
+                ),
+              ),
+            ),
     );
 
     final cardSize = GameFieldBloc.of(context).cardSize;
@@ -54,7 +72,7 @@ class _GameCardState extends State<GameCard> {
       width: cardSize,
       child: Draggable(
         maxSimultaneousDrags: 1,
-        feedback: child,
+        feedback: Container(),
         childWhenDragging: Opacity(
           opacity: 1,
           child: child,

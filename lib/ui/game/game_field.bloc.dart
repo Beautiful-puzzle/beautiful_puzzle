@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:beautiful_puzzle/models/game_card.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
@@ -28,19 +30,29 @@ class GameFieldBloc extends Bloc {
   ValueStream<List<GameCardModel>?> get generatedCards => _generatedCards;
 
   void _generateCards() {
+    int random(int min, int max){
+      return min + Random().nextInt(max - min);
+    }
+
     final list = <GameCardModel>[];
 
+    var currentNumber = 1;
+
+    final emptyNumber = random(0, rowCount * colCount);
     for (var i = 0; i < rowCount; i++) {
       for (var j = 0; j < colCount; j++) {
         list.add(
           GameCardModel(
             id: const Uuid().v1(),
+            number: currentNumber,
+            isEmpty: list.length == emptyNumber,
             offset: Offset(
               i * (cardSize + margin) + margin,
               j * (cardSize + margin) + margin,
             ),
           ),
         );
+        if(list.length != emptyNumber) currentNumber++;
       }
     }
 
