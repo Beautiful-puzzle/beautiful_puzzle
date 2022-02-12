@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 
 import 'package:beautiful_puzzle/models/game_card.dart';
@@ -6,43 +7,48 @@ import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:collection/collection.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:uuid/uuid.dart';
 
 class GameFieldBloc extends Bloc {
   GameFieldBloc() {
-    fieldSize = Size(colCount * (margin + cardSize) + margin,
-        rowCount * (margin + cardSize) + margin);
-    _generateCards();
+    fieldSize = Size(_colCount * (_margin + cardSize) + _margin,
+        _rowCount * (_margin + cardSize) + _margin);
+    _generatedCards.add(_generateCards());
+    _startTimer();
   }
 
-  final int rowCount = 5;
-  final int colCount = 5;
-  final double margin = 20;
-  final cardSize = 100.0;
-  late final Offset placeRadius = Offset(cardSize + margin, cardSize + margin);
+  final int _rowCount = 5;
+  final int _colCount = 5;
+  final double _margin = 20;
+  late final Offset _placeRadius =
+      Offset(cardSize + _margin, cardSize + _margin);
+  late Timer timer;
 
   late Size fieldSize;
   late Size screenSize;
+  final cardSize = 100.0;
 
-  final _isLoading = BehaviorSubject<bool>.seeded(false);
+  final _elapsedTime = BehaviorSubject<int>.seeded(0);
   final _generatedCards = BehaviorSubject<List<GameCardModel>?>.seeded(null);
-
-  ValueStream<bool> get isLoading => _isLoading;
+  final _movesLogs =
+      BehaviorSubject<List<Map<GameCardModel, GameCardModel>>>.seeded([]);
 
   ValueStream<List<GameCardModel>?> get generatedCards => _generatedCards;
+  ValueStream<List<Map<GameCardModel, GameCardModel>>> get movesLogs =>
+      _movesLogs;
+  ValueStream<int> get elapsedTime => _elapsedTime;
 
-  void _generateCards() {
+  List<GameCardModel> _generateCards() {
     int random(int min, int max) {
       return min + Random().nextInt(max - min);
     }
 
     int newRandom(List<GameCardModel> list) {
-      var generatedNumber = random(1, rowCount * colCount);
+      var generatedNumber = random(1, _rowCount * _colCount);
 
-      while (list.firstWhereOrNull(
-              (element) => element.number == generatedNumber) !=
-          null) {
-        generatedNumber = random(1, rowCount * colCount);
+      while (
+          list.firstWhereOrNull((element) => element.id == generatedNumber) !=
+              null) {
+        generatedNumber = random(1, _rowCount * _colCount);
       }
 
       return generatedNumber;
@@ -50,35 +56,53 @@ class GameFieldBloc extends Bloc {
 
     final list = <GameCardModel>[];
 
-    final emptyNumber = random(0, rowCount * colCount);
-    for (var i = 0; i < rowCount; i++) {
-      for (var j = 0; j < colCount; j++) {
+    final emptyNumber = random(0, _rowCount * _colCount);
+    for (var i = 0; i < _rowCount; i++) {
+      for (var j = 0; j < _colCount; j++) {
         list.add(
           GameCardModel(
-            id: const Uuid().v1(),
-            number: list.length == emptyNumber ? -1 : newRandom(list),
+            id: list.length == emptyNumber ? -1 : newRandom(list),
             isEmpty: list.length == emptyNumber,
             offset: Offset(
-              i * (cardSize + margin) + margin,
-              j * (cardSize + margin) + margin,
+              i * (cardSize + _margin) + _margin,
+              j * (cardSize + _margin) + _margin,
             ),
           ),
         );
       }
     }
 
-    _generatedCards.add(list);
+    return list;
   }
 
-  void topOrder(String id) {
-    /*final item =
-        _generatedCards.value!.firstWhere((element) => element.id == id);
+  void _startTimer() {
+    timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      _elapsedTime.add(++_elapsedTime.value);
+    });
+  }
 
+  void _clearCountdown() {
+    _elapsedTime.add(0);
+    timer.cancel();
+  }
+
+  void shuffle() {
+    _clearLogs();
+    _clearCountdown();
+
+    final newCards = _generateCards();
     _generatedCards.add(
       _generatedCards.value!
-        ..removeWhere((element) => element.id == id)
-        ..add(item),
-    );*/
+        ..forEach(
+          (element) {
+            element.offset = newCards
+                .firstWhere((generatedCard) => generatedCard.id == element.id)
+                .offset;
+          },
+        ),
+    );
+
+    _startTimer();
   }
 
   Offset swapCardsPositions({
@@ -97,7 +121,7 @@ class GameFieldBloc extends Bloc {
   Offset _swapCards(GameCardModel card) {
     final list = _generatedCards.value!;
 
-    final emptyCard = list.firstWhere((element) => element.number == -1);
+    final emptyCard = list.firstWhere((element) => element.id == -1);
 
     final tempOffset = emptyCard.offset;
 
@@ -105,28 +129,33 @@ class GameFieldBloc extends Bloc {
     card.offset = tempOffset;
 
     list[list.indexWhere((element) => element.id == card.id)] = card;
-    list[list.indexWhere((element) => element.number == -1)] = emptyCard;
+    list[list.indexWhere((element) => element.id == -1)] = emptyCard;
 
     _generatedCards.add(list);
-
+    _movesLogs.add(_movesLogs.value..add({card: emptyCard}));
     return tempOffset;
   }
 
   bool _isNearEmptyCard(Offset pos1) {
     final emptyPosition =
-        _generatedCards.value!.firstWhere((element) => element.number == -1);
+        _generatedCards.value!.firstWhere((element) => element.id == -1);
 
     final dx = (emptyPosition.offset.dx - pos1.dx).abs();
     final dy = (emptyPosition.offset.dy - pos1.dy).abs();
 
-    return (dx == 0.0 && dy <= placeRadius.dy) ||
-        (dx <= placeRadius.dx && dy == 0.0);
+    return (dx == 0.0 && dy <= _placeRadius.dy) ||
+        (dx <= _placeRadius.dx && dy == 0.0);
+  }
+
+  void _clearLogs() {
+    _movesLogs.add([]);
   }
 
   @override
   void dispose() {
-    _isLoading.close();
     _generatedCards.close();
+    _movesLogs.close();
+    _elapsedTime.close();
     super.dispose();
   }
 

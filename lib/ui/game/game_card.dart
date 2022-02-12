@@ -19,19 +19,18 @@ class GameCard extends StatefulWidget {
 }
 
 class _GameCardState extends State<GameCard> {
-  late var position = widget.card.offset;
-
-  var randomColor =
-      Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
+  late Offset position;
 
   @override
   void initState() {
-    Timer.periodic(const Duration(seconds: 1), (timer) {
-      randomColor =
-          Color((Random().nextDouble() * 0xFFFFFF).toInt()).withOpacity(1.0);
-      setState(() {});
-    });
+    position = widget.card.offset;
     super.initState();
+  }
+
+  @override
+  void didUpdateWidget(covariant GameCard oldWidget) {
+    position = widget.card.offset;
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -43,20 +42,20 @@ class _GameCardState extends State<GameCard> {
       ),
       clipBehavior: Clip.hardEdge,
       child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-              child: Container(
-                color: Colors.white.withOpacity(.5),
-                child: Center(
-                  child: Text(
-                    '${widget.card.number}',
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                    ),
-                  ),
-                ),
+        filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
+        child: Container(
+          color: Colors.white.withOpacity(.5),
+          child: Center(
+            child: Text(
+              '${widget.card.id}',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 34,
               ),
             ),
+          ),
+        ),
+      ),
     );
 
     final cardSize = GameFieldBloc.of(context).cardSize;
@@ -78,8 +77,6 @@ class _GameCardState extends State<GameCard> {
                 child: child,
               ),
               onDragUpdate: (details) => updatePosition(details.localPosition),
-              onDragStarted: () =>
-                  GameFieldBloc.of(context).topOrder(widget.card.id),
               onDragEnd: (_) => setState(
                 () => position = GameFieldBloc.of(context).swapCardsPositions(
                   currentPosition: position,
