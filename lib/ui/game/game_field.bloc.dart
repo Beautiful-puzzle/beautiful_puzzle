@@ -64,8 +64,8 @@ class GameFieldBloc extends Bloc {
             id: list.length == emptyNumber ? -1 : newRandom(list),
             isEmpty: list.length == emptyNumber,
             offset: Offset(
-              i * (cardSize + _margin) + _margin,
               j * (cardSize + _margin) + _margin,
+              i * (cardSize + _margin) + _margin,
             ),
           ),
         );
@@ -105,15 +105,50 @@ class GameFieldBloc extends Bloc {
     _startTimer();
   }
 
+  void isGameCompleted() {
+    final list = <GameCardModel>[]..addAll(_generatedCards.value!);
+
+    for (var i = 0; i < list.length - 1; i++) {
+      for (var j = 0; j < list.length - i - 1; j++) {
+        var additionalOffset = .0;
+        final item = list[j];
+        final nextItem = list[j + 1];
+
+        if (item.offset.dy < nextItem.offset.dy && nextItem.offset.dx < item.offset.dx) {
+          additionalOffset = _colCount * (_margin + cardSize);
+        }
+
+        //print('${item.id} : ${nextItem.id}  +$additionalOffset ');
+
+        if (item.offset.dx > (nextItem.offset.dx + additionalOffset)) {
+          final tempItem = nextItem;
+
+          list[j + 1] = item;
+          list[j] = tempItem;
+        }
+      }
+    }
+
+    print('');
+    print(list.map((e) => e.id).join(', '));
+    print('');
+   // print(exampleList.join(', '));
+    print('');
+
+
+  }
+
   Offset swapCardsPositions({
     required Offset currentPosition,
     required GameCardModel card,
   }) {
     var moveOffset = card.offset;
 
-    if (_isNearEmptyCard(currentPosition) && _isNearEmptyCard(card.offset)) {
+    if (_isNearEmptyCard(currentPosition, isBothAxis: true) && _isNearEmptyCard(card.offset)) {
       moveOffset = _swapCards(card);
     }
+
+    //isGameCompleted();
 
     return moveOffset;
   }
@@ -136,12 +171,16 @@ class GameFieldBloc extends Bloc {
     return tempOffset;
   }
 
-  bool _isNearEmptyCard(Offset pos1) {
+  bool _isNearEmptyCard(Offset pos1, {bool isBothAxis = false}) {
     final emptyPosition =
         _generatedCards.value!.firstWhere((element) => element.id == -1);
 
     final dx = (emptyPosition.offset.dx - pos1.dx).abs();
     final dy = (emptyPosition.offset.dy - pos1.dy).abs();
+
+    if(isBothAxis) {
+      return dx <= _placeRadius.dx && dy <= _placeRadius.dy;
+    }
 
     return (dx == 0.0 && dy <= _placeRadius.dy) ||
         (dx <= _placeRadius.dx && dy == 0.0);
