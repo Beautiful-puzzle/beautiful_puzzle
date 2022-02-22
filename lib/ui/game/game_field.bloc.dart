@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:math';
 
 import 'package:beautiful_puzzle/models/game_card.dart';
+import 'package:beautiful_puzzle/resources/dimens.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:collection/collection.dart';
@@ -10,22 +11,13 @@ import 'package:rxdart/rxdart.dart';
 
 class GameFieldBloc extends Bloc {
   GameFieldBloc() {
-    fieldSize = Size(_colCount * (_margin + cardSize) + _margin,
-        _rowCount * (_margin + cardSize) + _margin);
     _generatedCards.add(_generateCards());
     _startTimer();
   }
 
-  final int _rowCount = 5;
-  final int _colCount = 5;
-  final double _margin = 20;
-  late final Offset _placeRadius =
-      Offset(cardSize + _margin, cardSize + _margin);
-  late Timer timer;
+  Offset emptyCardOffset = Offset.zero;
 
-  late Size fieldSize;
-  late Size screenSize;
-  final cardSize = 100.0;
+  late Timer timer;
 
   final _elapsedTime = BehaviorSubject<int>.seeded(0);
   final _generatedCards = BehaviorSubject<List<GameCardModel>?>.seeded(null);
@@ -33,8 +25,10 @@ class GameFieldBloc extends Bloc {
       BehaviorSubject<List<Map<GameCardModel, GameCardModel>>>.seeded([]);
 
   ValueStream<List<GameCardModel>?> get generatedCards => _generatedCards;
+
   ValueStream<List<Map<GameCardModel, GameCardModel>>> get movesLogs =>
       _movesLogs;
+
   ValueStream<int> get elapsedTime => _elapsedTime;
 
   List<GameCardModel> _generateCards() {
@@ -43,12 +37,13 @@ class GameFieldBloc extends Bloc {
     }
 
     int newRandom(List<GameCardModel> list) {
-      var generatedNumber = random(1, _rowCount * _colCount);
+      var generatedNumber = random(1, Dimens.cardsInRow * Dimens.cardsInRow);
 
-      while (
-          list.firstWhereOrNull((element) => element.id == generatedNumber) !=
-              null) {
-        generatedNumber = random(1, _rowCount * _colCount);
+      while (list.firstWhereOrNull(
+            (element) => element.id == generatedNumber,
+          ) !=
+          null) {
+        generatedNumber = random(1, Dimens.cardsInRow * Dimens.cardsInRow);
       }
 
       return generatedNumber;
@@ -56,20 +51,16 @@ class GameFieldBloc extends Bloc {
 
     final list = <GameCardModel>[];
 
-    final emptyNumber = random(0, _rowCount * _colCount);
-    for (var i = 0; i < _rowCount; i++) {
-      for (var j = 0; j < _colCount; j++) {
-        list.add(
-          GameCardModel(
-            id: list.length == emptyNumber ? -1 : newRandom(list),
-            isEmpty: list.length == emptyNumber,
-            offset: Offset(
-              j * (cardSize + _margin) + _margin,
-              i * (cardSize + _margin) + _margin,
-            ),
-          ),
-        );
-      }
+    final emptyNumber = random(0, Dimens.cardsInRow * Dimens.cardsInRow);
+    for (var i = 0; i < Dimens.cardsInRow * Dimens.cardsInRow; i++) {
+      final position = newRandom(list);
+      list.add(
+        GameCardModel(
+          id: list.length == emptyNumber ? -1 : position,
+          isEmpty: list.length == emptyNumber,
+          position: i,
+        ),
+      );
     }
 
     return list;
@@ -95,9 +86,9 @@ class GameFieldBloc extends Bloc {
       _generatedCards.value!
         ..forEach(
           (element) {
-            element.offset = newCards
+            element.position = newCards
                 .firstWhere((generatedCard) => generatedCard.id == element.id)
-                .offset;
+                .position;
           },
         ),
     );
@@ -106,7 +97,7 @@ class GameFieldBloc extends Bloc {
   }
 
   void isGameCompleted() {
-    final list = <GameCardModel>[]..addAll(_generatedCards.value!);
+    /*final list = <GameCardModel>[]..addAll(_generatedCards.value!);
 
     for (var i = 0; i < list.length - 1; i++) {
       for (var j = 0; j < list.length - i - 1; j++) {
@@ -114,7 +105,8 @@ class GameFieldBloc extends Bloc {
         final item = list[j];
         final nextItem = list[j + 1];
 
-        if (item.offset.dy < nextItem.offset.dy && nextItem.offset.dx < item.offset.dx) {
+        if (item.offset.dy < nextItem.offset.dy &&
+            nextItem.offset.dx < item.offset.dx) {
           additionalOffset = _colCount * (_margin + cardSize);
         }
 
@@ -132,58 +124,63 @@ class GameFieldBloc extends Bloc {
     print('');
     print(list.map((e) => e.id).join(', '));
     print('');
-   // print(exampleList.join(', '));
-    print('');
-
-
+    // print(exampleList.join(', '));
+    print('');*/
   }
 
-  Offset swapCardsPositions({
-    required Offset currentPosition,
+  int swapCardsPositions({
+    required Offset currentOffset,
+    required Offset offsetRadius,
     required GameCardModel card,
   }) {
-    var moveOffset = card.offset;
+    var movePosition = card.position;
 
-    if (_isNearEmptyCard(currentPosition, isBothAxis: true) && _isNearEmptyCard(card.offset)) {
-      moveOffset = _swapCards(card);
+    final emptyCard =
+        _generatedCards.value!.firstWhere((element) => element.id == -1);
+
+    if ((emptyCard.position - card.position).abs() == 1 ||
+        emptyCard.position - 5 == card.position ||
+        emptyCard.position + 5 == card.position) {
+
+      if(_isNearEmptyCard(currentOffset, offsetRadius, isBothAxis: true)) {
+        movePosition = _swapCards(card);
+
+      }
+      return movePosition;
     }
 
-    //isGameCompleted();
-
-    return moveOffset;
+    return movePosition;
   }
 
-  Offset _swapCards(GameCardModel card) {
+  int _swapCards(GameCardModel card) {
     final list = _generatedCards.value!;
 
     final emptyCard = list.firstWhere((element) => element.id == -1);
 
-    final tempOffset = emptyCard.offset;
+    final tempPosition = emptyCard.position;
 
-    emptyCard.offset = card.offset;
-    card.offset = tempOffset;
+    emptyCard.position = card.position;
+    card.position = tempPosition;
 
     list[list.indexWhere((element) => element.id == card.id)] = card;
     list[list.indexWhere((element) => element.id == -1)] = emptyCard;
 
     _generatedCards.add(list);
     _movesLogs.add(_movesLogs.value..add({card: emptyCard}));
-    return tempOffset;
+    return tempPosition;
   }
 
-  bool _isNearEmptyCard(Offset pos1, {bool isBothAxis = false}) {
-    final emptyPosition =
-        _generatedCards.value!.firstWhere((element) => element.id == -1);
+  bool _isNearEmptyCard(Offset pos1, Offset placeRadius,
+      {bool isBothAxis = false}) {
+    final dx = (emptyCardOffset.dx - pos1.dx).abs();
+    final dy = (emptyCardOffset.dy - pos1.dy).abs();
 
-    final dx = (emptyPosition.offset.dx - pos1.dx).abs();
-    final dy = (emptyPosition.offset.dy - pos1.dy).abs();
-
-    if(isBothAxis) {
-      return dx <= _placeRadius.dx && dy <= _placeRadius.dy;
+    if (isBothAxis) {
+      return dx <= placeRadius.dx && dy <= placeRadius.dy;
     }
 
-    return (dx == 0.0 && dy <= _placeRadius.dy) ||
-        (dx <= _placeRadius.dx && dy == 0.0);
+    return (dx == 0.0 && dy <= placeRadius.dy) ||
+        (dx <= placeRadius.dx && dy == 0.0);
   }
 
   void _clearLogs() {

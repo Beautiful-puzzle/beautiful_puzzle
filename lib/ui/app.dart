@@ -1,5 +1,6 @@
 import 'package:beautiful_puzzle/initializer.dart';
 import 'package:beautiful_puzzle/ui/game/field/field.initializer.dart';
+import 'package:beautiful_puzzle/widgets/screen_size.widget.dart';
 import 'package:flutter/material.dart';
 
 class App extends StatelessWidget {
@@ -14,7 +15,9 @@ class App extends StatelessWidget {
           primarySwatch: Colors.blue,
         ),
         home: const Scaffold(
-          body: FieldInitializer(),
+          body: ScreenSize(
+            child: FieldInitializer(),
+          ),
         ),
       ),
     );

@@ -4,6 +4,7 @@ import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/game/game_card.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
+import 'package:beautiful_puzzle/utils/screen.data.dart';
 import 'package:flutter/material.dart';
 
 class GameFieldWidget extends StatefulWidget {
@@ -14,10 +15,11 @@ class GameFieldWidget extends StatefulWidget {
 }
 
 class _GameFieldWidgetState extends State<GameFieldWidget> {
+
+  Size fieldSize = Size.zero;
+
   @override
   Widget build(BuildContext context) {
-    GameFieldBloc.of(context).screenSize = MediaQuery.of(context).size;
-
     final field = RxBuilder<List<GameCardModel>?>(
       stream: GameFieldBloc.of(context).generatedCards,
       builder: (context, sList) {
@@ -76,30 +78,41 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
       ),
     );
 
-    return Stack(
-      children: [
-        Positioned(
-          top: 20,
-          left: 20,
-          child: Column(
-            children: [
-              counterText,
-              const SizedBox(height: 20),
-              elapsedTime,
-              const SizedBox(height: 20),
-              shuffleButton,
-            ],
-          ),
-        ),
-        Center(
-          child: Container(
-            color: ColorsResource.secondary,
-            height: GameFieldBloc.of(context).fieldSize.height,
-            width: GameFieldBloc.of(context).fieldSize.width,
-            child: field,
-          ),
-        ),
-      ],
+    return RxBuilder<Size>(
+      stream: ScreenDataBloc.of(context).screenSize,
+      builder: (context, sSize) {
+        updateFieldSize();
+
+        return Stack(
+          children: [
+            Positioned(
+              top: 20,
+              left: 20,
+              child: Column(
+                children: [
+                  counterText,
+                  const SizedBox(height: 20),
+                  elapsedTime,
+                  const SizedBox(height: 20),
+                  shuffleButton,
+                ],
+              ),
+            ),
+            Center(
+              child: Container(
+                color: ColorsResource.secondary,
+                height: fieldSize.height,
+                width: fieldSize.width,
+                child: field,
+              ),
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  void updateFieldSize() {
+    fieldSize = ScreenDataBloc.of(context).getFieldSize();
   }
 }
