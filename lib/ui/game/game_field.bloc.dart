@@ -23,13 +23,13 @@ class GameFieldBloc extends Bloc {
   final _generatedCards = BehaviorSubject<List<GameCardModel>?>.seeded(null);
   final _movesLogs =
       BehaviorSubject<List<Map<GameCardModel, GameCardModel>>>.seeded([]);
+  final _isGameComplete = BehaviorSubject<bool>.seeded(false);
 
   ValueStream<List<GameCardModel>?> get generatedCards => _generatedCards;
-
   ValueStream<List<Map<GameCardModel, GameCardModel>>> get movesLogs =>
       _movesLogs;
-
   ValueStream<int> get elapsedTime => _elapsedTime;
+  ValueStream<bool> get isGameComplete => _isGameComplete;
 
   List<GameCardModel> _generateCards() {
     int random(int min, int max) {
@@ -58,7 +58,7 @@ class GameFieldBloc extends Bloc {
         GameCardModel(
           id: list.length == emptyNumber ? -1 : position,
           isEmpty: list.length == emptyNumber,
-          position: i,
+          position: i /*list.length == emptyNumber ? 24 : position - 1*/,
         ),
       );
     }
@@ -97,35 +97,18 @@ class GameFieldBloc extends Bloc {
   }
 
   void isGameCompleted() {
-    /*final list = <GameCardModel>[]..addAll(_generatedCards.value!);
+    var isCompleted = false;
+    for (final element in _generatedCards.value!) {
+      if(element.id == -1) continue;
 
-    for (var i = 0; i < list.length - 1; i++) {
-      for (var j = 0; j < list.length - i - 1; j++) {
-        var additionalOffset = .0;
-        final item = list[j];
-        final nextItem = list[j + 1];
+        isCompleted = element.id == element.position + 1;
 
-        if (item.offset.dy < nextItem.offset.dy &&
-            nextItem.offset.dx < item.offset.dx) {
-          additionalOffset = _colCount * (_margin + cardSize);
-        }
-
-        //print('${item.id} : ${nextItem.id}  +$additionalOffset ');
-
-        if (item.offset.dx > (nextItem.offset.dx + additionalOffset)) {
-          final tempItem = nextItem;
-
-          list[j + 1] = item;
-          list[j] = tempItem;
-        }
-      }
+        if(element.id != element.position + 1) break;
     }
 
-    print('');
-    print(list.map((e) => e.id).join(', '));
-    print('');
-    // print(exampleList.join(', '));
-    print('');*/
+    if(isCompleted != _isGameComplete.value) {
+      _isGameComplete.add(isCompleted);
+    }
   }
 
   int swapCardsPositions({
@@ -133,6 +116,7 @@ class GameFieldBloc extends Bloc {
     required Offset offsetRadius,
     required GameCardModel card,
   }) {
+
     var movePosition = card.position;
 
     final emptyCard =
@@ -141,13 +125,12 @@ class GameFieldBloc extends Bloc {
     if ((emptyCard.position - card.position).abs() == 1 ||
         emptyCard.position - 5 == card.position ||
         emptyCard.position + 5 == card.position) {
-
-      if(_isNearEmptyCard(currentOffset, offsetRadius, isBothAxis: true)) {
+      if (_isNearEmptyCard(currentOffset, offsetRadius, isBothAxis: true)) {
         movePosition = _swapCards(card);
-
       }
-      return movePosition;
     }
+
+    isGameCompleted();
 
     return movePosition;
   }
@@ -192,6 +175,7 @@ class GameFieldBloc extends Bloc {
     _generatedCards.close();
     _movesLogs.close();
     _elapsedTime.close();
+    _isGameComplete.close();
     super.dispose();
   }
 

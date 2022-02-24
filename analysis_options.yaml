@@ -11,7 +11,7 @@ analyzer:
     - "lib/**/*.g.dart"
   strong-mode:
     implicit-casts: false
-    implicit-dynamic: false
+    implicit-dynamic: true
   errors:
     always_use_package_imports: error
     avoid_dynamic_calls: error

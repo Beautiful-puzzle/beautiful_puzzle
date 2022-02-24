@@ -1,0 +1,4 @@
+enum DialogResponse {
+  success,
+  failure,
+}

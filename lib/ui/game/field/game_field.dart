@@ -28,6 +28,7 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
         }
 
         return Stack(
+          clipBehavior: Clip.none,
           children: sList.data!.map((e) => GameCard(card: e)).toList(),
         );
       },
@@ -52,6 +53,20 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
         final count = sLogs.data?.length ?? 0;
         return Text(
           'Slides count: $count',
+          style: TextStyle(
+            fontSize: 20,
+            color: ColorsResource.background,
+          ),
+        );
+      },
+    );
+
+    final isGameCompleted = RxBuilder<bool>(
+      stream: GameFieldBloc.of(context).isGameComplete,
+      builder: (_, sIsComplete) {
+        final isComplete = sIsComplete.data ?? false;
+        return Text(
+          'Is complete: $isComplete',
           style: TextStyle(
             fontSize: 20,
             color: ColorsResource.background,
@@ -91,6 +106,8 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
               child: Column(
                 children: [
                   counterText,
+                  const SizedBox(height: 20),
+                  isGameCompleted,
                   const SizedBox(height: 20),
                   elapsedTime,
                   const SizedBox(height: 20),
