@@ -172,6 +172,8 @@ class GameFieldBloc extends Bloc {
 
   @override
   void dispose() {
+    _clearCountdown();
+
     _generatedCards.close();
     _movesLogs.close();
     _elapsedTime.close();
