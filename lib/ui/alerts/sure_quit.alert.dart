@@ -1,7 +1,7 @@
 import 'package:animated_gesture_detector/animated_gesture_detector.dart';
 import 'package:beautiful_puzzle/models/enums.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
-import 'package:beautiful_puzzle/ui/widget/base/dialog.navigator.dart';
+import 'package:beautiful_puzzle/ui/widgets/base/dialog.navigator.dart';
 import 'package:flutter/material.dart';
 
 class SureQuitAlert extends StatelessWidget {

@@ -1,5 +1,5 @@
 import 'package:beautiful_puzzle/ui/game/field/field.initializer.dart';
-import 'package:beautiful_puzzle/widgets/screen_size.widget.dart';
+import 'package:beautiful_puzzle/ui/widgets/screen_size.widget.dart';
 import 'package:flutter/material.dart';
 
 class SoloGameScreen extends StatelessWidget {

@@ -3,7 +3,7 @@ import 'package:beautiful_puzzle/ui/screens/main_menu.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/pvp_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/solo_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/splash.screen.dart';
-import 'package:beautiful_puzzle/ui/widget/base/dialog.navigator.dart';
+import 'package:beautiful_puzzle/ui/widgets/base/dialog.navigator.dart';
 import 'package:flutter/material.dart';
 
 Route<dynamic> generateRoute(RouteSettings settings, BuildContext context) {

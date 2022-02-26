@@ -14,7 +14,11 @@ class LeaderboardBloc extends Bloc {
 
   ValueStream<List<LeaderboardModel>?> get leaderboardList => _leaderboardList;
 
-  void _tempLeaders() {
+  Future<void> updateData() async {
+    await _tempLeaders();
+  }
+  Future<void> _tempLeaders() async {
+    await Future.delayed(Duration(seconds: 1));
     _leaderboardList
         .add(List.generate(15, (index) => LeaderboardModel(time: 0, slides: 0, username: "name"),)
     );

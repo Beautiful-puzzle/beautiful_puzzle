@@ -1,6 +1,9 @@
 import 'package:beautiful_puzzle/models/leaderboard_item.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.bloc.dart';
+import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
+import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
+import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
 import 'package:flutter/material.dart';
 
@@ -13,63 +16,83 @@ class LeaderBoardScreen extends StatelessWidget {
       stream: LeaderboardBloc.of(context).leaderboardList,
       builder: (context, sList) {
         final list = sList.data ?? [];
-        if (sList.data == null) {
-          return const SizedBox();
-        }
 
-        return ListView.builder(
-          itemCount: list.length,
-          itemBuilder: (context, index) {
-            final item = list[index];
-            return _listItem(
-              id: index,
-              name: item.username,
-              time: item.time,
-            );
-          },
+        return AnimatedSwapWidget(
+          child: RefreshIndicatorWidget(
+            onRefresh: LeaderboardBloc.of(context).updateData,
+            child: ListView.builder(
+              itemCount: list.length,
+              padding: EdgeInsets.zero,
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, index) {
+                final item = list[index];
+                return _listItem(
+                  id: index,
+                  name: item.username,
+                  time: item.time,
+                );
+              },
+            ),
+          ),
+          child1: ListView.builder(
+            itemCount: 20,
+            padding: EdgeInsets.zero,
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              return _listItem();
+            },
+          ),
+          isFirstVisible: sList.data != null,
         );
       },
     );
 
     return Scaffold(
-      body: Column(
-        children: [
-          const SizedBox(height: 100),
-          Text('Leaderboard'),
-          Container(
-            margin: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 10,
-            ),
-            padding: const EdgeInsets.symmetric(
-              vertical: 10,
-              horizontal: 20,
-            ),
-            decoration: BoxDecoration(
-              color: ColorsResource.primary,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(10.0),
+      body: Container(
+        margin: const EdgeInsets.symmetric(
+          vertical: 10,
+          horizontal: 10,
+        ),
+        child: Column(
+          children: [
+            const SizedBox(height: 100),
+            Text('Leaderboard'),
+            Container(
+              padding: const EdgeInsets.symmetric(
+                vertical: 10,
+                horizontal: 20,
+              ),
+              decoration: BoxDecoration(
+                color: ColorsResource.primary,
+                borderRadius: const BorderRadius.vertical(
+                  top: Radius.circular(10.0),
+                ),
+              ),
+              child: Row(
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: _titleText(text: 'Place'),
+                  ),
+                  Expanded(
+                    flex: 3,
+                    child: _titleText(text: 'Name'),
+                  ),
+                  Expanded(
+                    flex: 1,
+                    child: _titleText(text: 'Time'),
+                  ),
+                ],
               ),
             ),
-            child: Row(
-              children: [
-                Expanded(
-                  flex: 1,
-                  child: _titleText(text: 'Place'),
-                ),
-                Expanded(
-                  flex: 3,
-                  child: _titleText(text: 'Name'),
-                ),
-                Expanded(
-                  flex: 1,
-                  child: _titleText(text: 'Time'),
-                ),
-              ],
+            Expanded(
+              child: RefreshIndicatorWidget(
+                onRefresh: LeaderboardBloc.of(context).updateData,
+                child: list,
+              ),
             ),
-          ),
-          Expanded(child: list),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -84,16 +107,51 @@ class LeaderBoardScreen extends StatelessWidget {
     );
   }
 
-  Widget _listItem({required int id, required String name, required int time}) {
-    return Container(
-      color: Colors.blueGrey,
+  Widget _listItem({
+    int? id,
+    String? name,
+    int? time,
+  }) {
+    final item = Container(
+      decoration: BoxDecoration(
+        color: ColorsResource.shade,
+        borderRadius: BorderRadius.circular(15.0),
+      ),
+      padding: const EdgeInsets.symmetric(
+        vertical: 15,
+        horizontal: 20,
+      ),
+      margin: const EdgeInsets.symmetric(
+        vertical: 5,
+        //horizontal: 20,
+      ),
       child: Row(
         children: [
-          Text('$id'),
-          Text('$name'),
-          Text('$time'),
+          Expanded(flex: 1, child: Text('$id')),
+          Expanded(flex: 3, child: Text('$name')),
+          Expanded(flex: 1, child: Text('$time')),
         ],
       ),
     );
+
+    if (id == null || name == null || time == null) {
+      return ShimmerWidget(
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(15.0),
+          ),
+          padding: const EdgeInsets.symmetric(
+            vertical: 15 + 8,
+            horizontal: 20,
+          ),
+          margin: const EdgeInsets.symmetric(
+            vertical: 5,
+            //horizontal: 20,
+          ),
+        ),
+      );
+    }
+    return item;
   }
 }
