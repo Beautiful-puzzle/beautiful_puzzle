@@ -1,27 +1,33 @@
 import 'package:beautiful_puzzle/models/leaderboard_item.dart';
+import 'package:beautiful_puzzle/models/response.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class LeaderboardBloc extends Bloc {
+  LeaderboardBloc({
+    required this.leaderboardRepository,
+  });
 
-  LeaderboardBloc() {
-    _tempLeaders();
-  }
-  final _leaderboardList = BehaviorSubject<List<LeaderboardModel>?>.seeded(
-      null);
+  final LeaderboardRepository leaderboardRepository;
+  final _leaderboardList =
+      BehaviorSubject<List<LeaderboardModel>?>.seeded(null);
 
   ValueStream<List<LeaderboardModel>?> get leaderboardList => _leaderboardList;
 
   Future<void> updateData() async {
-    await _tempLeaders();
+    await getLeaderboard();
   }
-  Future<void> _tempLeaders() async {
-    await Future.delayed(Duration(seconds: 1));
-    _leaderboardList
-        .add(List.generate(15, (index) => LeaderboardModel(time: 0, slides: 0, username: "name"),)
-    );
+
+  Future<Response<bool>> getLeaderboard() async {
+    final result = await leaderboardRepository.getLeaderBoard();
+
+    if (!result.hasError && result.value != null) {
+      _leaderboardList.add(result.value);
+    }
+    return Response.value(!result.hasError);
   }
 
   @override

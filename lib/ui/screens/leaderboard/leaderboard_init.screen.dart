@@ -1,3 +1,4 @@
+import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.bloc.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.screen.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
@@ -16,7 +17,10 @@ class LeaderBoardInit extends StatelessWidget {
   Widget build(BuildContext context) {
     return BlocBuilder(
       blocBuilder: () {
-        return LeaderboardBloc();
+        final bloc = LeaderboardBloc(
+          leaderboardRepository: LeaderboardRepository.of(context),
+        );
+        return bloc..getLeaderboard();
       },
       builder: (context, bloc) {
         return const LeaderBoardScreen();

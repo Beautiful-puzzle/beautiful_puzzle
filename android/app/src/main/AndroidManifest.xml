@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.beautiful_puzzle">
+    package="com.khudolii.beautiful_puzzle">
    <application
         android:label="beautiful_puzzle"
         android:name="${applicationName}"

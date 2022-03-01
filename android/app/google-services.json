@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "470345202982",
+    "firebase_url": "https://beautiful-puzzle-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "beautiful-puzzle",
+    "storage_bucket": "beautiful-puzzle.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:470345202982:android:2ee22d602f96df122b95e7",
+        "android_client_info": {
+          "package_name": "com.khudolii.beautiful_puzzle"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "470345202982-95m8esegtrnckveohsasevugqfvpi598.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.khudolii.beautiful_puzzle",
+            "certificate_hash": "23e5e418394c09e769fcb9d6263018d0ae72d24e"
+          }
+        },
+        {
+          "client_id": "470345202982-3t3eni2l8ci7h8i91ukgu4086s6t4bhp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCV_Bynps6kMALVcObIzeNF1puocqKsh9M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "470345202982-3t3eni2l8ci7h8i91ukgu4086s6t4bhp.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
