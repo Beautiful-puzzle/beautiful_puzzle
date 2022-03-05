@@ -12,10 +12,8 @@ class LeaderboardBloc extends Bloc {
   });
 
   final LeaderboardRepository leaderboardRepository;
-  final _leaderboardList =
-      BehaviorSubject<List<LeaderboardModel>?>.seeded(null);
 
-  ValueStream<List<LeaderboardModel>?> get leaderboardList => _leaderboardList;
+  ValueStream<List<LeaderboardModel>?> get leaderboardList => leaderboardRepository.leaders;
 
   Future<void> updateData() async {
     await getLeaderboard();
@@ -24,16 +22,7 @@ class LeaderboardBloc extends Bloc {
   Future<Response<bool>> getLeaderboard() async {
     final result = await leaderboardRepository.getLeaderBoard();
 
-    if (!result.hasError && result.value != null) {
-      _leaderboardList.add(result.value);
-    }
     return Response.value(!result.hasError);
-  }
-
-  @override
-  void dispose() {
-    _leaderboardList.close();
-    super.dispose();
   }
 
   static LeaderboardBloc of(BuildContext context) =>

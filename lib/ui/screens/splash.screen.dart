@@ -1,4 +1,4 @@
-import 'package:beautiful_puzzle/ui/screens/main_menu.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/menu/main_menu.screen.dart';
 import 'package:flutter/material.dart';
 
 class SplashScreen extends StatefulWidget {

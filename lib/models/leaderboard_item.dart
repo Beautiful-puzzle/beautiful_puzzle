@@ -13,7 +13,16 @@ class LeaderboardModel {
       LeaderboardModel(
         username: json['username'] as String,
         time: json['time'] as int,
-        slides:
-        json['slides'] as int,
+        slides: json['slides'] as int,
       );
+
+  Map<String, dynamic> toJson() {
+    final val = <String, dynamic>{};
+
+    val['username'] = username;
+    val['time'] = time;
+    val['slides'] = slides;
+
+    return val;
+  }
 }

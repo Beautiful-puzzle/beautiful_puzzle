@@ -5,7 +5,7 @@ import 'package:beautiful_puzzle/repositories/base/remote_static.repository.dart
 class NetworkLeaderboardRepository {
   final _repo = RemoteStaticRepository();
 
-  Future<List<LeaderboardModel>> getLeaderboard() async {
+  Future<List<LeaderboardModel>?> getLeaderboard() async {
     final response = await _repo.getCollection('leaderboard').get();
 
     final result = response.docs
@@ -13,5 +13,11 @@ class NetworkLeaderboardRepository {
         .toList();
 
     return result;
+  }
+
+  Future<bool> addLeader(LeaderboardModel leader) async {
+    final response = await _repo.getCollection('leaderboard').add(leader.toJson());
+
+    return true;
   }
 }

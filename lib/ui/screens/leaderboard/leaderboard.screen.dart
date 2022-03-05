@@ -53,43 +53,47 @@ class LeaderBoardScreen extends StatelessWidget {
           vertical: 10,
           horizontal: 10,
         ),
-        child: Column(
+        child: Stack(
           children: [
-            const SizedBox(height: 100),
-            Text('Leaderboard'),
-            Container(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10,
-                horizontal: 20,
-              ),
-              decoration: BoxDecoration(
-                color: ColorsResource.primary,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(10.0),
+            Column(
+              children: [
+                const SizedBox(height: 100),
+                const Text('Leaderboard'),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 10,
+                    horizontal: 20,
+                  ),
+                  decoration: BoxDecoration(
+                    color: ColorsResource.primary,
+                    borderRadius: const BorderRadius.vertical(
+                      top: Radius.circular(10.0),
+                    ),
+                  ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        flex: 1,
+                        child: _titleText(text: 'Place'),
+                      ),
+                      Expanded(
+                        flex: 3,
+                        child: _titleText(text: 'Name'),
+                      ),
+                      Expanded(
+                        flex: 1,
+                        child: _titleText(text: 'Time'),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    flex: 1,
-                    child: _titleText(text: 'Place'),
+                Expanded(
+                  child: RefreshIndicatorWidget(
+                    onRefresh: LeaderboardBloc.of(context).updateData,
+                    child: list,
                   ),
-                  Expanded(
-                    flex: 3,
-                    child: _titleText(text: 'Name'),
-                  ),
-                  Expanded(
-                    flex: 1,
-                    child: _titleText(text: 'Time'),
-                  ),
-                ],
-              ),
-            ),
-            Expanded(
-              child: RefreshIndicatorWidget(
-                onRefresh: LeaderboardBloc.of(context).updateData,
-                child: list,
-              ),
+                ),
+              ],
             ),
           ],
         ),
@@ -100,7 +104,7 @@ class LeaderBoardScreen extends StatelessWidget {
   Widget _titleText({required String text}) {
     return Text(
       text,
-      style: TextStyle(
+      style: const TextStyle(
         color: Colors.white,
         fontWeight: FontWeight.bold,
       ),

@@ -1,4 +1,6 @@
+import 'package:beautiful_puzzle/main.bloc.dart';
 import 'package:beautiful_puzzle/models/enums.dart';
+import 'package:beautiful_puzzle/ui/alerts/save_game_result.alert.dart';
 import 'package:beautiful_puzzle/ui/alerts/sure_quit.alert.dart';
 import 'package:beautiful_puzzle/ui/game/field/game_field.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
@@ -17,11 +19,22 @@ class FieldInitializer extends StatefulWidget {
 class _FieldInitializerState extends State<FieldInitializer> {
   @override
   Widget build(BuildContext context) {
-    final bloc = BlocBuilder(
+    final bloc = BlocBuilder<GameFieldBloc>(
       blocBuilder: () {
         return GameFieldBloc();
       },
       builder: (context, bloc) {
+        bloc.isGameComplete.listen((isComplete) {
+          if (isComplete) {
+            MainBloc.of(context).addLeader(
+              username: "Test name",
+              slides: bloc.getSlidesCount(),
+              time: bloc.elapsedTime.value,
+            );
+            SaveGameResultAlert.navigate(context);
+          }
+        });
+
         return const GameFieldWidget();
       },
     );
@@ -31,7 +44,7 @@ class _FieldInitializerState extends State<FieldInitializer> {
       onWillPop: () async {
         final result = await SureQuitAlert.navigate(context);
 
-        if(result == DialogResponse.success && mounted) {
+        if (result == DialogResponse.success && mounted) {
           Navigator.pop(context);
         }
 

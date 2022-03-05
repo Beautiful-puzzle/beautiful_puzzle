@@ -16,13 +16,31 @@ class LeaderboardRepository {
   final NetworkLeaderboardRepository _networkRepo;
 
   final _leaders = BehaviorSubject<List<LeaderboardModel>?>.seeded(null);
-  ValueStream<List<LeaderboardModel>?> get hubContacts => _leaders;
+  ValueStream<List<LeaderboardModel>?> get leaders => _leaders;
 
   Future<Response<List<LeaderboardModel>>> getLeaderBoard() async {
     try {
       final info = await _networkRepo.getLeaderboard();
 
+      if (info != null) {
+        _leaders.add(info);
+      }
+
       return Response.value(info);
+    } on ServerError catch (e) {
+      return Response.error(BaseError.fromDynamic(e));
+    }
+  }
+
+  Future<Response<bool>> addLeader(LeaderboardModel leader) async {
+    try {
+      final info = await _networkRepo.addLeader(leader);
+
+      if (info) {
+        _leaders.add([..._leaders.value ?? [], leader]);
+      }
+
+      return const Response.value(true);
     } on ServerError catch (e) {
       return Response.error(BaseError.fromDynamic(e));
     }

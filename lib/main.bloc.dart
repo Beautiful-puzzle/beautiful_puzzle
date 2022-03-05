@@ -1,19 +1,36 @@
 
+import 'package:beautiful_puzzle/models/leaderboard_item.dart';
+import 'package:beautiful_puzzle/models/response.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class MainBloc extends Bloc {
+  MainBloc({
+    required this.leaderboardRepository,
+  });
 
-  final _elapsedTime = BehaviorSubject<int>.seeded(0);
+  final LeaderboardRepository leaderboardRepository;
 
-  ValueStream<int> get elapsedTime => _elapsedTime;
+  ValueStream<List<LeaderboardModel>?> get leaderboardList =>
+      leaderboardRepository.leaders;
 
-  @override
-  void dispose() {
-    _elapsedTime.close();
-    super.dispose();
+  Future<Response<bool>> addLeader({
+    required String username,
+    required int slides,
+    required int time,
+  }) async {
+    final model = LeaderboardModel(
+      username: username,
+      time: time,
+      slides: slides,
+    );
+
+    final result = await leaderboardRepository.addLeader(model);
+
+    return Response.value(!result.hasError);
   }
 
   static MainBloc of(BuildContext context) =>

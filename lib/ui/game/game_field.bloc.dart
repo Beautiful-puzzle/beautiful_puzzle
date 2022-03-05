@@ -58,7 +58,7 @@ class GameFieldBloc extends Bloc {
         GameCardModel(
           id: list.length == emptyNumber ? -1 : position,
           isEmpty: list.length == emptyNumber,
-          position: i /*list.length == emptyNumber ? 24 : position - 1*/,
+          position: /*i*/ list.length == emptyNumber ? 24 : position - 1,
         ),
       );
     }
@@ -99,24 +99,25 @@ class GameFieldBloc extends Bloc {
   void isGameCompleted() {
     var isCompleted = false;
     for (final element in _generatedCards.value!) {
-      if(element.id == -1) continue;
+      if (element.id == -1) continue;
 
-        isCompleted = element.id == element.position + 1;
+      isCompleted = element.id == element.position + 1;
 
-        if(element.id != element.position + 1) break;
+      if (element.id != element.position + 1) break;
     }
 
-    if(isCompleted != _isGameComplete.value) {
+    if (isCompleted != _isGameComplete.value) {
       _isGameComplete.add(isCompleted);
     }
   }
+
+  int getSlidesCount() => movesLogs.value.length;
 
   int swapCardsPositions({
     required Offset currentOffset,
     required Offset offsetRadius,
     required GameCardModel card,
   }) {
-
     var movePosition = card.position;
 
     final emptyCard =
