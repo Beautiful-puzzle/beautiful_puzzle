@@ -11,12 +11,26 @@ class LeaderboardBloc extends Bloc {
     required this.leaderboardRepository,
   });
 
+  SortBy sortType = SortBy.time;
   final LeaderboardRepository leaderboardRepository;
 
-  ValueStream<List<LeaderboardModel>?> get leaderboardList => leaderboardRepository.leaders;
+  ValueStream<List<LeaderboardModel>?> get leaderboardList =>
+      leaderboardRepository.leaders;
 
   Future<void> updateData() async {
     await getLeaderboard();
+  }
+
+  Future<void> sortBy(SortBy type) async {
+    sortType = type;
+
+    int sortByTime(LeaderboardModel a, LeaderboardModel b) =>
+        a.time < b.time ? -1 : 1;
+    int sortBySlides(LeaderboardModel a, LeaderboardModel b) =>
+        a.slides < b.slides ? -1 : 1;
+
+    leaderboardRepository.updateList(leaderboardList.value!
+      ..sort(type == SortBy.time ? sortByTime : sortBySlides));
   }
 
   Future<Response<bool>> getLeaderboard() async {

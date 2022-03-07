@@ -1,11 +1,15 @@
 import 'package:beautiful_puzzle/models/leaderboard_item.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
+import 'package:beautiful_puzzle/utils/time.dart';
 import 'package:flutter/material.dart';
+
+import 'widgets/type_selector.widget.dart';
 
 class LeaderBoardScreen extends StatelessWidget {
   const LeaderBoardScreen({Key? key}) : super(key: key);
@@ -27,9 +31,11 @@ class LeaderBoardScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final item = list[index];
                 return _listItem(
-                  id: index,
+                  context,
+                  id: index + 1,
                   name: item.username,
                   time: item.time,
+                  slides: item.slides,
                 );
               },
             ),
@@ -39,7 +45,7 @@ class LeaderBoardScreen extends StatelessWidget {
             padding: EdgeInsets.zero,
             physics: const BouncingScrollPhysics(),
             itemBuilder: (context, index) {
-              return _listItem();
+              return _listItem(context);
             },
           ),
           isFirstVisible: sList.data != null,
@@ -54,6 +60,7 @@ class LeaderBoardScreen extends StatelessWidget {
           horizontal: 10,
         ),
         child: Stack(
+          alignment: Alignment.center,
           children: [
             Column(
               children: [
@@ -95,6 +102,14 @@ class LeaderBoardScreen extends StatelessWidget {
                 ),
               ],
             ),
+            Positioned(
+              bottom: 20,
+              child: TypeSelectorWidget(
+                onTap: (sortBy) {
+                  LeaderboardBloc.of(context).sortBy(sortBy);
+                },
+              ),
+            ),
           ],
         ),
       ),
@@ -111,10 +126,11 @@ class LeaderBoardScreen extends StatelessWidget {
     );
   }
 
-  Widget _listItem({
+  Widget _listItem(BuildContext context, {
     int? id,
     String? name,
     int? time,
+    int? slides,
   }) {
     final item = Container(
       decoration: BoxDecoration(
@@ -133,7 +149,14 @@ class LeaderBoardScreen extends StatelessWidget {
         children: [
           Expanded(flex: 1, child: Text('$id')),
           Expanded(flex: 3, child: Text('$name')),
-          Expanded(flex: 1, child: Text('$time')),
+          Expanded(
+            flex: 1,
+            child: Text(
+              LeaderboardBloc.of(context).sortType == SortBy.time
+                  ? ParsedTime.secondsToString(time ?? 0)
+                  : slides.toString(),
+            ),
+          ),
         ],
       ),
     );

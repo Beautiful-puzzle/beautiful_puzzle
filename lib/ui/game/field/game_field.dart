@@ -5,6 +5,7 @@ import 'package:beautiful_puzzle/ui/game/game_card.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
 import 'package:beautiful_puzzle/utils/screen.data.dart';
+import 'package:beautiful_puzzle/utils/time.dart';
 import 'package:flutter/material.dart';
 
 class GameFieldWidget extends StatefulWidget {
@@ -39,11 +40,7 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
       builder: (context, sTime) {
         final time = sTime.data ?? 0;
 
-        final seconds = time % 60;
-        final minutes = time ~/ 60;
-        final secondsText = seconds >= 10 ? '$seconds' : '0$seconds';
-        final minutesText = minutes >= 10 ? '$minutes' : '0$minutes';
-        return Text('Elapsed time: $minutesText:$secondsText');
+        return Text('Elapsed time: ${ParsedTime.secondsToString(time)}');
       },
     );
 

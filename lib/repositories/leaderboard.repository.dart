@@ -9,6 +9,11 @@ import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
+enum SortBy {
+  time,
+  slides
+}
+
 @immutable
 class LeaderboardRepository {
   LeaderboardRepository(this._networkRepo) : super();
@@ -23,7 +28,7 @@ class LeaderboardRepository {
       final info = await _networkRepo.getLeaderboard();
 
       if (info != null) {
-        _leaders.add(info);
+        updateList(info);
       }
 
       return Response.value(info);
@@ -37,13 +42,17 @@ class LeaderboardRepository {
       final info = await _networkRepo.addLeader(leader);
 
       if (info) {
-        _leaders.add([..._leaders.value ?? [], leader]);
+        updateList([..._leaders.value ?? [], leader]);
       }
 
       return const Response.value(true);
     } on ServerError catch (e) {
       return Response.error(BaseError.fromDynamic(e));
     }
+  }
+
+  void updateList(List<LeaderboardModel> list) {
+    _leaders.add(list);
   }
 
   /// Cleans resources.
