@@ -16,13 +16,14 @@ class GameFieldWidget extends StatefulWidget {
 }
 
 class _GameFieldWidgetState extends State<GameFieldWidget> {
-
   Size fieldSize = Size.zero;
 
   @override
   Widget build(BuildContext context) {
+    final bloc = GameFieldBloc.of(context);
+
     final field = RxBuilder<List<GameCardModel>?>(
-      stream: GameFieldBloc.of(context).generatedCards,
+      stream: bloc.generatedCards,
       builder: (context, sList) {
         if (sList.data == null) {
           return const SizedBox();
@@ -36,7 +37,7 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
     );
 
     final elapsedTime = RxBuilder<int>(
-      stream: GameFieldBloc.of(context).elapsedTime,
+      stream: bloc.elapsedTime,
       builder: (context, sTime) {
         final time = sTime.data ?? 0;
 
@@ -45,7 +46,7 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
     );
 
     final counterText = RxBuilder<List<Map<GameCardModel, GameCardModel>>>(
-      stream: GameFieldBloc.of(context).movesLogs,
+      stream: bloc.movesLogs,
       builder: (_, sLogs) {
         final count = sLogs.data?.length ?? 0;
         return Text(
@@ -59,7 +60,7 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
     );
 
     final isGameCompleted = RxBuilder<bool>(
-      stream: GameFieldBloc.of(context).isGameComplete,
+      stream: bloc.isGameComplete,
       builder: (_, sIsComplete) {
         final isComplete = sIsComplete.data ?? false;
         return Text(
@@ -72,22 +73,35 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
       },
     );
 
-    final shuffleButton = AnimatedGestureDetector(
-      onTap: () => GameFieldBloc.of(context).shuffle(),
-      child: Container(
-        decoration: BoxDecoration(
-          color: ColorsResource.primary,
-          borderRadius: BorderRadius.circular(100.0),
-        ),
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
-        child: Text(
-          'Shuffle',
-          style: TextStyle(
-            color: ColorsResource.surface,
-            fontSize: 20,
-          ),
-        ),
-      ),
+    final shuffleButton = RxBuilder<bool>(
+      stream: bloc.isGameStarted,
+      builder: (_, sIsStarted) {
+        final isGameStarted = sIsStarted.data ?? false;
+
+        return RxBuilder<bool>(
+          stream: bloc.isGameComplete,
+          builder: (_, sIsComplete) {
+            final isGameComplete = sIsComplete.data ?? false;
+            return AnimatedGestureDetector(
+              onTap: isGameStarted ? bloc.shuffle : bloc.startGame,
+              child: Container(
+                decoration: BoxDecoration(
+                  color: ColorsResource.primary,
+                  borderRadius: BorderRadius.circular(100.0),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
+                child: Text(
+                  isGameStarted ? isGameComplete ? 'Restart' : 'Shuffle' : 'Start game',
+                  style: TextStyle(
+                    color: ColorsResource.surface,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            );
+          },
+        );
+      },
     );
 
     return RxBuilder<Size>(

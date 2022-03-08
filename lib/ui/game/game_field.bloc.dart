@@ -11,25 +11,29 @@ import 'package:rxdart/rxdart.dart';
 
 class GameFieldBloc extends Bloc {
   GameFieldBloc() {
-    _generatedCards.add(_generateCards());
-    _startTimer();
+    isGameComplete.listen((isComplete) {
+      if(isComplete){
+        timer?.cancel();
+      }
+    });
   }
-
   Offset emptyCardOffset = Offset.zero;
 
-  late Timer timer;
+  Timer? timer;
 
   final _elapsedTime = BehaviorSubject<int>.seeded(0);
   final _generatedCards = BehaviorSubject<List<GameCardModel>?>.seeded(null);
   final _movesLogs =
       BehaviorSubject<List<Map<GameCardModel, GameCardModel>>>.seeded([]);
   final _isGameComplete = BehaviorSubject<bool>.seeded(false);
+  final _isGameStarted = BehaviorSubject<bool>.seeded(false);
 
   ValueStream<List<GameCardModel>?> get generatedCards => _generatedCards;
   ValueStream<List<Map<GameCardModel, GameCardModel>>> get movesLogs =>
       _movesLogs;
   ValueStream<int> get elapsedTime => _elapsedTime;
   ValueStream<bool> get isGameComplete => _isGameComplete;
+  ValueStream<bool> get isGameStarted => _isGameStarted;
 
   List<GameCardModel> _generateCards() {
     int random(int min, int max) {
@@ -58,7 +62,7 @@ class GameFieldBloc extends Bloc {
         GameCardModel(
           id: list.length == emptyNumber ? -1 : position,
           isEmpty: list.length == emptyNumber,
-          position: /*i*/ list.length == emptyNumber ? 24 : position - 1,
+          position: /*-2*/ i /*list.length == emptyNumber ? 24 : position - 1*/,
         ),
       );
     }
@@ -68,18 +72,33 @@ class GameFieldBloc extends Bloc {
 
   void _startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      _elapsedTime.add(++_elapsedTime.value);
+      if (!_elapsedTime.isClosed) {
+        _elapsedTime.add(++_elapsedTime.value);
+      }
     });
   }
 
   void _clearCountdown() {
     _elapsedTime.add(0);
-    timer.cancel();
+    timer?.cancel();
+  }
+
+  void startGame() {
+    _isGameStarted.add(true);
+    _clearLogs();
+    _clearCountdown();
+
+    _generatedCards.add(_generateCards());
+    _startTimer();
   }
 
   void shuffle() {
     _clearLogs();
     _clearCountdown();
+
+    if (_isGameComplete.value == true) {
+      _isGameComplete.add(false);
+    }
 
     final newCards = _generateCards();
     _generatedCards.add(
@@ -118,6 +137,8 @@ class GameFieldBloc extends Bloc {
     required Offset offsetRadius,
     required GameCardModel card,
   }) {
+    if(isGameComplete.value) return card.position;
+
     var movePosition = card.position;
 
     final emptyCard =
@@ -179,6 +200,7 @@ class GameFieldBloc extends Bloc {
     _movesLogs.close();
     _elapsedTime.close();
     _isGameComplete.close();
+    _isGameStarted.close();
     super.dispose();
   }
 

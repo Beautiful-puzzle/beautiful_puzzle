@@ -1,5 +1,8 @@
+import 'dart:async';
+
 import 'package:beautiful_puzzle/main.bloc.dart';
 import 'package:beautiful_puzzle/models/enums.dart';
+import 'package:beautiful_puzzle/resources/dimens.dart';
 import 'package:beautiful_puzzle/ui/alerts/save_game_result.alert.dart';
 import 'package:beautiful_puzzle/ui/alerts/sure_quit.alert.dart';
 import 'package:beautiful_puzzle/ui/game/field/game_field.dart';
@@ -24,14 +27,18 @@ class _FieldInitializerState extends State<FieldInitializer> {
         return GameFieldBloc();
       },
       builder: (context, bloc) {
-        bloc.isGameComplete.listen((isComplete) {
+        bloc.isGameComplete.listen((isComplete) async {
           if (isComplete) {
-            MainBloc.of(context).addLeader(
-              username: "Test name",
-              slides: bloc.getSlidesCount(),
-              time: bloc.elapsedTime.value,
+            unawaited(
+              MainBloc.of(context).addLeader(
+                username: "Test name",
+                slides: bloc.getSlidesCount(),
+                time: bloc.elapsedTime.value,
+              ),
             );
-            SaveGameResultAlert.navigate(context);
+            await Future.delayed(Dimens.delayAfterGameCompleted);
+            if (!mounted) return;
+            await SaveGameResultAlert.navigate(context);
           }
         });
 

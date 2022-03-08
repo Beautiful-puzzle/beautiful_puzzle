@@ -25,10 +25,35 @@ class _GameCardState extends State<GameCard> {
   double _margin = Dimens.marginBetweenCards;
   double cardSize = Dimens.cardSize;
 
+  Color cardColor = Colors.blue.withOpacity(.5);
 
   @override
   void initState() {
-    positionToOffset(widget.card.position);
+    positionToOffset(-2);
+
+    runAfterBuild((_) async {
+
+      final totalDuration = Dimens.delayAfterGameCompleted.inMilliseconds;
+      final delayDuration = totalDuration ~/
+          (Dimens.cardsInRow * Dimens.cardsInRow) *
+          widget.card.position;
+
+      await Future.delayed(Duration(milliseconds: delayDuration));
+
+      positionToOffset(widget.card.position);
+
+      if (!mounted) return;
+      GameFieldBloc.of(context).isGameComplete.listen((isComplete) async {
+        await Future.delayed(Duration(milliseconds: delayDuration));
+
+        if (isComplete) {
+          cardColor = Colors.amber.withOpacity(.5);
+        } else {
+          cardColor = Colors.blue.withOpacity(.5);
+        }
+        setState(() {});
+      });
+    });
     super.initState();
   }
 
@@ -42,16 +67,14 @@ class _GameCardState extends State<GameCard> {
   Widget build(BuildContext context) {
     cardSize = ScreenDataBloc.of(context).getCardSize();
     _margin = ScreenDataBloc.of(context).getMarginSize();
-    final child = AnimatedContainer(
-      duration: const Duration(milliseconds: 500),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(20.0),
-      ),
+    final child = Container(
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0)),
       clipBehavior: Clip.hardEdge,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
-        child: Container(
-          color: Colors.white.withOpacity(.5),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 250),
+          color: cardColor,
           child: Center(
             child: Text(
               '${widget.card.id}',
@@ -86,7 +109,8 @@ class _GameCardState extends State<GameCard> {
                 () => positionToOffset(
                   GameFieldBloc.of(context).swapCardsPositions(
                     currentOffset: offset,
-                    offsetRadius: Offset(cardSize + _margin, cardSize + _margin),
+                    offsetRadius:
+                        Offset(cardSize + _margin, cardSize + _margin),
                     card: widget.card,
                   ),
                 ),
@@ -97,6 +121,8 @@ class _GameCardState extends State<GameCard> {
   }
 
   void updatePosition(Offset newPosition) {
+    if(GameFieldBloc.of(context).isGameComplete.value) return;
+
     final screenSize = ScreenDataBloc.of(context).screenSize.value;
     final fieldSize = ScreenDataBloc.of(context).getFieldSize();
 
@@ -131,8 +157,15 @@ class _GameCardState extends State<GameCard> {
       y * (cardSize + _margin) + _margin,
     );
 
+    if (position == -2) {
+      offset = Offset(
+        (17 % Dimens.cardsInRow) * (cardSize + _margin) + _margin,
+        5.2 * (cardSize + _margin) + _margin,
+      );
+    }
+
     runAfterBuild((_) {
-      if(widget.card.id == -1) {
+      if (widget.card.id == -1) {
         GameFieldBloc.of(context).emptyCardOffset = offset;
       }
     });
