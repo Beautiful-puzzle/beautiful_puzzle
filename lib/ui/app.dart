@@ -1,6 +1,6 @@
 import 'package:beautiful_puzzle/initializer.dart';
 import 'package:beautiful_puzzle/main.bloc.dart';
-import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/ui/routes.dart';
 import 'package:beautiful_puzzle/ui/screens/splash.screen.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';

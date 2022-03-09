@@ -3,6 +3,7 @@ import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard_init.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/pvp_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/solo_game.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/rooms_list.init.dart';
 import 'package:flutter/material.dart';
 
 class MainMenuScreen extends StatelessWidget {
@@ -35,7 +36,7 @@ class MainMenuScreen extends StatelessWidget {
                     const SizedBox(width: 10),
                     _button(
                       title: 'PvP',
-                      onTap: () => PvpGameScreen.navigate(context),
+                      onTap: () => RoomsListInit.navigate(context),
                     ),
                   ],
                 ),

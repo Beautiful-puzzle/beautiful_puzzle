@@ -1,6 +1,6 @@
 import 'package:beautiful_puzzle/models/leaderboard_item.dart';
 import 'package:beautiful_puzzle/models/response.dart';
-import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';

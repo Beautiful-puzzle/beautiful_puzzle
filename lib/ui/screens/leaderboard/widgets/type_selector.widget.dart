@@ -1,5 +1,5 @@
 import 'package:animated_gesture_detector/animated_gesture_detector.dart';
-import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/resources/dimens.dart';
 import 'package:flutter/material.dart';

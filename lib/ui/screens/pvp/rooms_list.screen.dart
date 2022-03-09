@@ -1,29 +1,37 @@
-import 'package:beautiful_puzzle/models/leaderboard_item.dart';
-import 'package:beautiful_puzzle/repositories/leaderboard/leaderboard.repository.dart';
+import 'package:animated_gesture_detector/animated_gesture_detector.dart';
+import 'package:beautiful_puzzle/models/room_item.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
-import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.bloc.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/rooms_list.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
-import 'package:beautiful_puzzle/utils/time.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/type_selector.widget.dart';
+import 'widgets/add_room.alert.dart';
 
-class LeaderBoardScreen extends StatelessWidget {
-  const LeaderBoardScreen({Key? key}) : super(key: key);
+class RoomsListScreen extends StatefulWidget {
+  const RoomsListScreen({Key? key}) : super(key: key);
 
   @override
+  State<RoomsListScreen> createState() => _RoomsListScreenState();
+}
+
+class _RoomsListScreenState extends State<RoomsListScreen> {
+  @override
   Widget build(BuildContext context) {
-    final list = RxBuilder<List<LeaderboardModel>?>(
-      stream: LeaderboardBloc.of(context).leaderboardList,
+    final list = RxBuilder<List<RoomModel>?>(
+      stream: RoomsListBloc
+          .of(context)
+          .roomsList,
       builder: (context, sList) {
         final list = sList.data ?? [];
 
         return AnimatedSwapWidget(
           child: RefreshIndicatorWidget(
-            onRefresh: LeaderboardBloc.of(context).updateData,
+            onRefresh: RoomsListBloc
+                .of(context)
+                .updateData,
             child: ListView.builder(
               itemCount: list.length,
               padding: EdgeInsets.zero,
@@ -33,9 +41,7 @@ class LeaderBoardScreen extends StatelessWidget {
                 return _listItem(
                   context,
                   id: index + 1,
-                  name: item.username,
-                  time: item.time,
-                  slides: item.slides,
+                  name: item.name,
                 );
               },
             ),
@@ -96,21 +102,37 @@ class LeaderBoardScreen extends StatelessWidget {
                 ),
                 Expanded(
                   child: RefreshIndicatorWidget(
-                    onRefresh: LeaderboardBloc.of(context).updateData,
+                    onRefresh: RoomsListBloc
+                        .of(context)
+                        .updateData,
                     child: list,
                   ),
                 ),
               ],
             ),
-            Positioned(
-              bottom: 20,
-              child: TypeSelectorWidget(
-                onTap: (sortBy) {
-                  LeaderboardBloc.of(context).sortBy(sortBy);
-                },
-              ),
-            ),
+            _addRoomButton(),
           ],
+        ),
+      ),
+    );
+  }
+
+  Widget _addRoomButton() {
+    return Positioned(
+      bottom: 20,
+      right: 20,
+      child: AnimatedGestureDetector(
+        onTap: () {
+          final bloc = RoomsListBloc.of(context);
+          AddRoomAlert.navigate(context, bloc: bloc);
+        },
+        child: Container(
+          decoration: BoxDecoration(
+            color: ColorsResource.primary,
+            borderRadius: BorderRadius.circular(100.0),
+          ),
+          padding: EdgeInsets.all(20),
+          child: Icon(Icons.add),
         ),
       ),
     );
@@ -129,8 +151,6 @@ class LeaderBoardScreen extends StatelessWidget {
   Widget _listItem(BuildContext context, {
     int? id,
     String? name,
-    int? time,
-    int? slides,
   }) {
     final item = Container(
       decoration: BoxDecoration(
@@ -149,19 +169,11 @@ class LeaderBoardScreen extends StatelessWidget {
         children: [
           Expanded(flex: 1, child: Text('$id')),
           Expanded(flex: 3, child: Text('$name')),
-          Expanded(
-            flex: 1,
-            child: Text(
-              LeaderboardBloc.of(context).sortType == SortBy.time
-                  ? ParsedTime.secondsToString(time ?? 0)
-                  : slides.toString(),
-            ),
-          ),
         ],
       ),
     );
 
-    if (id == null || name == null || time == null) {
+    if (id == null || name == null) {
       return ShimmerWidget(
         child: Container(
           decoration: BoxDecoration(

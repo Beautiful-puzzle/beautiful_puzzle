@@ -1,5 +1,7 @@
-import 'package:beautiful_puzzle/repositories/leaderboard.repository.dart';
+import 'package:beautiful_puzzle/repositories/leaderboard/leaderboard.repository.dart';
 import 'package:beautiful_puzzle/repositories/leaderboard/network_leaderboard.repository.dart';
+import 'package:beautiful_puzzle/repositories/rooms/network_rooms.repository.dart';
+import 'package:beautiful_puzzle/repositories/rooms/rooms.repository.dart';
 import 'package:beautiful_puzzle/utils/firebase.initializer.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +23,7 @@ class Initializer extends StatefulWidget {
 class _InitializerState extends State<Initializer> {
 
   late LeaderboardRepository leaderboardRepository;
+  late RoomsRepository roomsRepository;
 
   @override
   void initState() {
@@ -28,6 +31,9 @@ class _InitializerState extends State<Initializer> {
 
     final networkLeaderboardRepository = NetworkLeaderboardRepository();
     leaderboardRepository = LeaderboardRepository(networkLeaderboardRepository);
+
+    final networkRoomsRepository = NetworkRoomsRepository();
+    roomsRepository = RoomsRepository(networkRoomsRepository);
 
     super.initState();
   }
@@ -37,6 +43,7 @@ class _InitializerState extends State<Initializer> {
     return ProviderService(
       data: <Type, dynamic>{
         LeaderboardRepository: leaderboardRepository,
+        RoomsRepository: roomsRepository,
       },
       builder: (context) {
         return widget.child;
