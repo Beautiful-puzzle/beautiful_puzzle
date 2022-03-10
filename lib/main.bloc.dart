@@ -12,6 +12,7 @@ class MainBloc extends Bloc {
     required this.leaderboardRepository,
   });
 
+  final String username = 'Test player${DateTime.now().millisecondsSinceEpoch}';
   final LeaderboardRepository leaderboardRepository;
 
   ValueStream<List<LeaderboardModel>?> get leaderboardList =>

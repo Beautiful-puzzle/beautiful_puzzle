@@ -1,14 +1,15 @@
 import 'package:animated_gesture_detector/animated_gesture_detector.dart';
 import 'package:beautiful_puzzle/models/room_item.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
-import 'package:beautiful_puzzle/ui/screens/pvp/rooms_list.bloc.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room/room_await.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
 import 'package:flutter/material.dart';
 
-import 'widgets/add_room.alert.dart';
+import '../widgets/enter_room.alert.dart';
 
 class RoomsListScreen extends StatefulWidget {
   const RoomsListScreen({Key? key}) : super(key: key);
@@ -21,17 +22,13 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
   @override
   Widget build(BuildContext context) {
     final list = RxBuilder<List<RoomModel>?>(
-      stream: RoomsListBloc
-          .of(context)
-          .roomsList,
+      stream: RoomsListBloc.of(context).roomsList,
       builder: (context, sList) {
         final list = sList.data ?? [];
 
         return AnimatedSwapWidget(
           child: RefreshIndicatorWidget(
-            onRefresh: RoomsListBloc
-                .of(context)
-                .updateData,
+            onRefresh: RoomsListBloc.of(context).updateData,
             child: ListView.builder(
               itemCount: list.length,
               padding: EdgeInsets.zero,
@@ -42,6 +39,20 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
                   context,
                   id: index + 1,
                   name: item.name,
+                  onTap: () async {
+                    final bloc = RoomsListBloc.of(context);
+
+                    bloc.createdRoom = item;
+
+                    final response =
+                        await EnterRoomAlert.navigate(context, bloc: bloc)
+                            as String?;
+
+                    if (response == item.password) {
+                      if (!mounted) return;
+                      RoomAwaitScreen.navigate(context, RoomArgs(bloc.createdRoom!));
+                    }
+                  },
                 );
               },
             ),
@@ -102,9 +113,7 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
                 ),
                 Expanded(
                   child: RefreshIndicatorWidget(
-                    onRefresh: RoomsListBloc
-                        .of(context)
-                        .updateData,
+                    onRefresh: RoomsListBloc.of(context).updateData,
                     child: list,
                   ),
                 ),
@@ -122,9 +131,19 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
       bottom: 20,
       right: 20,
       child: AnimatedGestureDetector(
-        onTap: () {
-          final bloc = RoomsListBloc.of(context);
-          AddRoomAlert.navigate(context, bloc: bloc);
+        onTap: () async {
+          final bloc = RoomsListBloc.of(context)..createdRoom = null;
+          final response =
+              await EnterRoomAlert.navigate(context, bloc: bloc) as String?;
+
+          if (response == null) return;
+          await bloc.addRoom(
+            name: bloc.lateGeneratedRoomName!,
+            password: response,
+          );
+
+          if (!mounted) return;
+          RoomAwaitScreen.navigate(context, RoomArgs(bloc.createdRoom!));
         },
         child: Container(
           decoration: BoxDecoration(
@@ -148,28 +167,33 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
     );
   }
 
-  Widget _listItem(BuildContext context, {
+  Widget _listItem(
+    BuildContext context, {
     int? id,
     String? name,
+    VoidCallback? onTap,
   }) {
-    final item = Container(
-      decoration: BoxDecoration(
-        color: ColorsResource.shade,
-        borderRadius: BorderRadius.circular(15.0),
-      ),
-      padding: const EdgeInsets.symmetric(
-        vertical: 15,
-        horizontal: 20,
-      ),
-      margin: const EdgeInsets.symmetric(
-        vertical: 5,
-        //horizontal: 20,
-      ),
-      child: Row(
-        children: [
-          Expanded(flex: 1, child: Text('$id')),
-          Expanded(flex: 3, child: Text('$name')),
-        ],
+    final item = AnimatedGestureDetector(
+      onTap: onTap,
+      child: Container(
+        decoration: BoxDecoration(
+          color: ColorsResource.shade,
+          borderRadius: BorderRadius.circular(15.0),
+        ),
+        padding: const EdgeInsets.symmetric(
+          vertical: 15,
+          horizontal: 20,
+        ),
+        margin: const EdgeInsets.symmetric(
+          vertical: 5,
+          //horizontal: 20,
+        ),
+        child: Row(
+          children: [
+            Expanded(flex: 1, child: Text('$id')),
+            Expanded(flex: 3, child: Text('$name')),
+          ],
+        ),
       ),
     );
 

@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'game_card.g.dart';
+
+@JsonSerializable()
 class GameCardModel {
   GameCardModel({
     required this.isEmpty,
@@ -9,4 +14,9 @@ class GameCardModel {
 
   int position;
   final int id;
+
+  factory GameCardModel.fromJson(Map<String, dynamic> json) =>
+      _$GameCardModelFromJson(json);
+
+  Map<String, dynamic> toJson() => _$GameCardModelToJson(this);
 }

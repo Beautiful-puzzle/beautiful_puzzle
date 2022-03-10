@@ -1,7 +1,7 @@
 import 'package:beautiful_puzzle/repositories/rooms/rooms.repository.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.bloc.dart';
-import 'package:beautiful_puzzle/ui/screens/pvp/rooms_list.bloc.dart';
-import 'package:beautiful_puzzle/ui/screens/pvp/rooms_list.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.bloc.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.screen.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:flutter/material.dart';
 

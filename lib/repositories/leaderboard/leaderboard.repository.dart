@@ -55,7 +55,6 @@ class LeaderboardRepository {
     _leaders.add(list);
   }
 
-  /// Cleans resources.
   void dispose() {
     _leaders.close();
   }

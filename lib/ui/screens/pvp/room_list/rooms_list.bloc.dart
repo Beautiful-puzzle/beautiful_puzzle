@@ -13,9 +13,12 @@ class RoomsListBloc extends Bloc {
   });
 
   String? lateGeneratedRoomName;
+  RoomModel? createdRoom;
+
   final RoomsRepository roomsRepository;
 
   ValueStream<List<RoomModel>?> get roomsList => roomsRepository.rooms;
+
 
   Future<void> updateData() async {
     await getRooms();
@@ -38,14 +41,14 @@ class RoomsListBloc extends Bloc {
     required String password,
   }) async {
     final result = await roomsRepository.addRoom(
-      RoomModel(name: name, password: password),
+      createdRoom = RoomModel(name: name, password: password),
     );
 
     return Response.value(!result.hasError);
   }
 
+  String generateRoomName() => lateGeneratedRoomName = randomAlphaNumeric(6);
+
   static RoomsListBloc of(BuildContext context) =>
       ProviderService.of<RoomsListBloc>(context);
-
-  String generateRoomName() => lateGeneratedRoomName = randomAlphaNumeric(6);
 }

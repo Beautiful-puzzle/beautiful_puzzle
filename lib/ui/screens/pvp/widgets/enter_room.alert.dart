@@ -1,13 +1,14 @@
 import 'package:animated_gesture_detector/animated_gesture_detector.dart';
 import 'package:beautiful_puzzle/models/enums.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
-import 'package:beautiful_puzzle/ui/screens/pvp/rooms_list.bloc.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room/room_await.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/base/dialog.navigator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-class AddRoomAlert extends StatelessWidget {
-  AddRoomAlert({Key? key, required this.bloc}) : super(key: key);
+class EnterRoomAlert extends StatelessWidget {
+  EnterRoomAlert({Key? key, required this.bloc}) : super(key: key);
 
   final RoomsListBloc bloc;
 
@@ -18,7 +19,7 @@ class AddRoomAlert extends StatelessWidget {
     return dialogNavigate(
       context: context,
       barrierColor: Colors.black.withOpacity(.8),
-      dialog: AddRoomAlert(bloc: bloc),
+      dialog: EnterRoomAlert(bloc: bloc),
       dialogBuilder: (dialog, animation) {
         return SlideTransition(
           position: animation,
@@ -28,17 +29,15 @@ class AddRoomAlert extends StatelessWidget {
     );
   }
 
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     final button = AnimatedGestureDetector(
-      onTap: () {
-        bloc.addRoom(
-          name: bloc.lateGeneratedRoomName!,
-          password: passwordController.text,
-        );
-      },
+      onTap: () => bloc.createdRoom != null
+          ? validate(context)
+          : Navigator.pop(context, passwordController.text.trim()),
       child: Container(
         padding: const EdgeInsets.symmetric(
           vertical: 12,
@@ -57,7 +56,7 @@ class AddRoomAlert extends StatelessWidget {
     );
 
     final nahButton = AnimatedGestureDetector(
-      onTap: () => Navigator.pop(context, DialogResponse.failure),
+      onTap: () => Navigator.pop(context),
       child: Container(
         padding: const EdgeInsets.symmetric(
           vertical: 12,
@@ -75,15 +74,22 @@ class AddRoomAlert extends StatelessWidget {
       children: [
         const SizedBox(height: 98),
         Text(
-          'Room name: ${bloc.generateRoomName()}',
+          'Room name: ${bloc.createdRoom?.name ?? bloc.generateRoomName()}',
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 27),
-        TextField(
-          controller: passwordController,
-          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-          keyboardType: TextInputType.number,
-          maxLength: 8,
+        Form(
+          key: _formKey,
+          child: TextFormField(
+            controller: passwordController,
+            inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+            keyboardType: TextInputType.number,
+            validator: (value) =>
+                bloc.createdRoom != null && value != bloc.createdRoom!.password
+                    ? 'Wrong password'
+                    : null,
+            maxLength: 8,
+          ),
         ),
         const SizedBox(height: 27),
         Row(
@@ -115,5 +121,12 @@ class AddRoomAlert extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  void validate(BuildContext context) {
+    final FormState? form = _formKey.currentState;
+    if (form?.validate() ?? false) {
+      Navigator.pop(context, passwordController.text.trim());
+    }
   }
 }

@@ -1,3 +1,8 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'leaderboard_item.g.dart';
+
+@JsonSerializable()
 class LeaderboardModel {
   LeaderboardModel({
     required this.username,
@@ -10,19 +15,7 @@ class LeaderboardModel {
   final int slides;
 
   factory LeaderboardModel.fromJson(Map<String, dynamic> json) =>
-      LeaderboardModel(
-        username: json['username'] as String,
-        time: json['time'] as int,
-        slides: json['slides'] as int,
-      );
+      _$LeaderboardModelFromJson(json);
 
-  Map<String, dynamic> toJson() {
-    final val = <String, dynamic>{};
-
-    val['username'] = username;
-    val['time'] = time;
-    val['slides'] = slides;
-
-    return val;
-  }
+  Map<String, dynamic> toJson() => _$LeaderboardModelToJson(this);
 }

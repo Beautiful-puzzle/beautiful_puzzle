@@ -62,7 +62,7 @@ class GameFieldBloc extends Bloc {
         GameCardModel(
           id: list.length == emptyNumber ? -1 : position,
           isEmpty: list.length == emptyNumber,
-          position: /*-2*/ i /*list.length == emptyNumber ? 24 : position - 1*/,
+          position: /*-2*/ /*i*/ list.length == emptyNumber ? 24 : position - 1,
         ),
       );
     }
