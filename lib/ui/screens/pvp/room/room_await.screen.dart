@@ -4,8 +4,9 @@ import 'package:beautiful_puzzle/models/player.dart';
 import 'package:beautiful_puzzle/models/room_item.dart';
 import 'package:beautiful_puzzle/repositories/rooms/rooms.repository.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
+import 'package:beautiful_puzzle/resources/dimens.dart';
+import 'package:beautiful_puzzle/ui/screens/modes/pvp_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room/room.bloc.dart';
-import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
@@ -57,7 +58,14 @@ class _RoomAwaitScreenState extends State<_Screen> {
   @override
   void initState() {
     runAfterBuild((_) {
-      RoomBloc.of(context).addPlayer(name: MainBloc.of(context).username);
+      final bloc = RoomBloc.of(context);
+      bloc.addPlayer(name: MainBloc.of(context).username);
+
+      bloc.timerValue.listen((value) {
+        if (value == 0) {
+          PvpGameScreen.navigate(context);
+        }
+      });
     });
     super.initState();
   }
@@ -104,19 +112,56 @@ class _RoomAwaitScreenState extends State<_Screen> {
       },
       child: Scaffold(
         body: Center(
-          child: Column(
+          child: Stack(
             children: [
-              const Spacer(),
-              Text('Room name: ${bloc.room.name}'),
-              Text('Room password: ${bloc.room.password}'),
-              const Spacer(),
-              _playerList(),
-              const Spacer(),
-              startButton,
-              const Spacer(),
+              Column(
+                children: [
+                  const Spacer(),
+                  Text('Room name: ${bloc.room.name}'),
+                  Text('Room password: ${bloc.room.password}'),
+                  const Spacer(),
+                  _playerList(),
+                  const Spacer(),
+                  startButton,
+                  const Spacer(),
+                ],
+              ),
+              _countdownWidget(),
             ],
           ),
         ),
+      ),
+    );
+  }
+
+  Widget _countdownWidget() {
+    return Positioned.fill(
+      child: RxBuilder<int?>(
+        stream: RoomBloc.of(context).timerValue,
+        builder: (_, sTime) {
+          final stringTime = sTime.data == 4 ? '' : sTime.data.toString();
+
+          return IgnorePointer(
+            ignoring: stringTime.isEmpty,
+            child: AnimatedContainer(
+              duration: Dimens.fastDuration,
+              decoration: BoxDecoration(
+                color: stringTime.isEmpty ? Colors.transparent : Colors.black,
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
+              child: Align(
+                alignment: Alignment.bottomCenter,
+                child: Text(
+                  stringTime,
+                  style: TextStyle(
+                    color: ColorsResource.surface,
+                    fontSize: 20,
+                  ),
+                ),
+              ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -135,7 +180,9 @@ class _RoomAwaitScreenState extends State<_Screen> {
           itemBuilder: (context, index) {
             if (list == null) return _listItem(context);
 
-            if (list[index].name == RoomBloc.of(context).player.value!.name) return const SizedBox();
+            if (list[index].name == RoomBloc.of(context).player.value!.name) {
+              return const SizedBox();
+            }
 
             final item = list[index];
             return _listItem(
