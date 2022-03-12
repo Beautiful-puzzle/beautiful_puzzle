@@ -10,13 +10,19 @@ import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 
 class GameFieldBloc extends Bloc {
-  GameFieldBloc() {
+  GameFieldBloc({required this.isAutoStart}) {
+    if(isAutoStart) {
+      startGame();
+    }
+
     isGameComplete.listen((isComplete) {
       if(isComplete){
         timer?.cancel();
       }
     });
   }
+
+  final bool isAutoStart;
   Offset emptyCardOffset = Offset.zero;
 
   Timer? timer;
@@ -62,7 +68,7 @@ class GameFieldBloc extends Bloc {
         GameCardModel(
           id: list.length == emptyNumber ? -1 : position,
           isEmpty: list.length == emptyNumber,
-          position: /*-2*/ /*i*/ list.length == emptyNumber ? 24 : position - 1,
+          position: /*-2*/ i /*list.length == emptyNumber ? 24 : position - 1*/,
         ),
       );
     }

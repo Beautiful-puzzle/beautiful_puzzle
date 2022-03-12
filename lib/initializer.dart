@@ -6,22 +6,26 @@ import 'package:beautiful_puzzle/utils/firebase.initializer.dart';
 import 'package:beautiful_puzzle/utils/provider.service.dart';
 import 'package:flutter/material.dart';
 
+typedef InitializationBuilder = Widget Function(
+  BuildContext context,
+  String initialRoute,
+);
+
 /// App-wide initializer of all services, repositories, plugins, etc.
 class Initializer extends StatefulWidget {
   /// Constructs an instance of [Initializer].
   const Initializer({
     Key? key,
-    required this.child,
+    required this.builder,
   }) : super(key: key);
 
-  final Widget child;
+  final InitializationBuilder builder;
 
   @override
   _InitializerState createState() => _InitializerState();
 }
 
 class _InitializerState extends State<Initializer> {
-
   late LeaderboardRepository leaderboardRepository;
   late RoomsRepository roomsRepository;
 
@@ -46,7 +50,7 @@ class _InitializerState extends State<Initializer> {
         RoomsRepository: roomsRepository,
       },
       builder: (context) {
-        return widget.child;
+        return widget.builder(context, '/');
       },
     );
   }

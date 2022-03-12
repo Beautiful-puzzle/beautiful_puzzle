@@ -2,6 +2,7 @@ import 'package:animated_gesture_detector/animated_gesture_detector.dart';
 import 'package:beautiful_puzzle/models/room_item.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room/room_await.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room/room_init.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
@@ -50,7 +51,7 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
 
                     if (response == item.password) {
                       if (!mounted) return;
-                      RoomAwaitScreen.navigate(context, RoomArgs(bloc.createdRoom!));
+                      RoomInitScreen.navigate(context, RoomArgs(bloc.createdRoom!));
                     }
                   },
                 );

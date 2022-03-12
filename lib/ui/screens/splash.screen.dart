@@ -1,5 +1,7 @@
+import 'package:beautiful_puzzle/resources/animations.dart';
 import 'package:beautiful_puzzle/ui/screens/menu/main_menu.screen.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
@@ -25,8 +27,14 @@ class _SplashScreenState extends State<SplashScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
-      body: Center(child: Text('Splash')),
+    return Scaffold(
+      body: Center(
+        child: Lottie.asset(
+          Animations.splashIcon,
+          height: 500,
+          width: 500,
+        ),
+      ),
     );
   }
 }

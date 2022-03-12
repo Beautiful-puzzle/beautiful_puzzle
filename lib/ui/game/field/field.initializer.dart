@@ -13,8 +13,9 @@ import 'package:flutter/material.dart';
 /// Game field initializer widget
 class FieldInitializer extends StatefulWidget {
   /// Default constructor
-  const FieldInitializer({Key? key}) : super(key: key);
+  const FieldInitializer({Key? key, this.isAutoStart = false}) : super(key: key);
 
+  final bool isAutoStart;
   @override
   State<FieldInitializer> createState() => _FieldInitializerState();
 }
@@ -24,7 +25,7 @@ class _FieldInitializerState extends State<FieldInitializer> {
   Widget build(BuildContext context) {
     final bloc = BlocBuilder<GameFieldBloc>(
       blocBuilder: () {
-        return GameFieldBloc();
+        return GameFieldBloc(isAutoStart: widget.isAutoStart);
       },
       builder: (context, bloc) {
         bloc.isGameComplete.listen((isComplete) async {

@@ -19,42 +19,23 @@ class RoomArgs {
   RoomArgs(this.room);
 }
 
-class RoomAwaitScreen extends StatelessWidget {
+class RoomAwaitScreen extends StatefulWidget {
   const RoomAwaitScreen({Key? key, required this.args}) : super(key: key);
 
-  static const String routeName = '/room_await';
+  final RoomArgs args;
+
+  static const String routeName = '/';
 
   static void navigate(BuildContext context, RoomArgs args) {
     Navigator.of(context).pushNamed(routeName, arguments: args);
   }
 
-  final RoomArgs args;
 
   @override
-  Widget build(BuildContext context) {
-    return BlocBuilder(
-      blocBuilder: () {
-        final bloc = RoomBloc(
-          roomsRepository: RoomsRepository.of(context),
-          room: args.room,
-        )..setRoomStream();
-        return bloc;
-      },
-      builder: (context, bloc) {
-        return const _Screen();
-      },
-    );
-  }
+  State<RoomAwaitScreen> createState() => _RoomAwaitScreenState();
 }
 
-class _Screen extends StatefulWidget {
-  const _Screen({Key? key}) : super(key: key);
-
-  @override
-  State<_Screen> createState() => _RoomAwaitScreenState();
-}
-
-class _RoomAwaitScreenState extends State<_Screen> {
+class _RoomAwaitScreenState extends State<RoomAwaitScreen> {
   @override
   void initState() {
     runAfterBuild((_) {
@@ -62,7 +43,7 @@ class _RoomAwaitScreenState extends State<_Screen> {
       bloc.addPlayer(name: MainBloc.of(context).username);
 
       bloc.timerValue.listen((value) {
-        if (value == 0) {
+        if (value == 0 && mounted) {
           PvpGameScreen.navigate(context);
         }
       });

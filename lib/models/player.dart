@@ -16,7 +16,9 @@ class Player {
   final String name;
 
   @JsonKey(fromJson: _logsFromJson, toJson: _logsToJson)
-  final List<Map<GameCardModel, GameCardModel>> movesLogs;
+  List<GameCardModel> movesLogs;
+
+  //final List<Map<GameCardModel, GameCardModel>> movesLogs;
 
   //final List<Map<int, int>> movesLogs;
 
@@ -31,20 +33,23 @@ class Player {
       };
 }
 
-String _logsToJson(List<Map<GameCardModel, GameCardModel>> logs) => logs
+String _logsToJson(List<GameCardModel> logs) =>
+    jsonEncode(logs.map((e) => e.toJson()).toList());
+/*String _logsToJson(List<Map<GameCardModel, GameCardModel>> logs) => logs
     .map((e) => e.map(
           (k, e) => MapEntry(jsonEncode(k.toJson()), jsonEncode(e.toJson())),
         ))
     .toList()
-    .toString();
+    .toString();*/
 
-List<Map<GameCardModel, GameCardModel>> _logsFromJson(String json) =>
-    (jsonDecode(json) as List<dynamic>?)
-        ?.map((e) => (e as Map<String, String>).map(
-              (k, e) => MapEntry(
-                GameCardModel.fromJson(jsonDecode(k) as Map<String, dynamic>),
-                GameCardModel.fromJson(jsonDecode(e) as Map<String, dynamic>),
-              ),
-            ))
-        .toList() ??
-    const [];
+List<GameCardModel> _logsFromJson(String json) {
+  //print(jsonDecode(json) as List<dynamic>?);
+ /* (json['movesLogs'] as List<dynamic>?)
+      ?.map((e) => GameCardModel.fromJson(e as Map<String, dynamic>))
+      .toList()*/
+  return (jsonDecode(json) as List<dynamic>?)
+      ?.map((e) =>
+      GameCardModel.fromJson(jsonDecode(jsonEncode(e)) as Map<String, dynamic>))
+      .toList() ??
+      const [];
+}

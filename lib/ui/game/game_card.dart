@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:beautiful_puzzle/models/game_card.dart';
 import 'package:beautiful_puzzle/resources/dimens.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room/room.bloc.dart';
 import 'package:beautiful_puzzle/utils/screen.data.dart';
 import 'package:beautiful_puzzle/utils/simple_code.dart';
 import 'package:flutter/material.dart';
@@ -11,9 +12,11 @@ class GameCard extends StatefulWidget {
   const GameCard({
     Key? key,
     required this.card,
+    this.isSecondField = false,
   }) : super(key: key);
 
   final GameCardModel card;
+  final bool isSecondField;
 
   @override
   _GameCardState createState() => _GameCardState();
@@ -32,7 +35,6 @@ class _GameCardState extends State<GameCard> {
     positionToOffset(-2);
 
     runAfterBuild((_) async {
-
       final totalDuration = Dimens.delayAfterGameCompleted.inMilliseconds;
       final delayDuration = totalDuration ~/
           (Dimens.cardsInRow * Dimens.cardsInRow) *
@@ -65,10 +67,12 @@ class _GameCardState extends State<GameCard> {
 
   @override
   Widget build(BuildContext context) {
-    cardSize = ScreenDataBloc.of(context).getCardSize();
-    _margin = ScreenDataBloc.of(context).getMarginSize();
+    cardSize = ScreenDataBloc.of(context).getCardSize() /
+        (widget.isSecondField ? 2 : 1);
+    _margin = ScreenDataBloc.of(context).getMarginSize() /
+        (widget.isSecondField ? 2 : 1);
     final child = Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(20.0)),
+      decoration: BoxDecoration(borderRadius: BorderRadius.circular(widget.isSecondField ? 10.0 : 20.0)),
       clipBehavior: Clip.hardEdge,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
@@ -78,9 +82,9 @@ class _GameCardState extends State<GameCard> {
           child: Center(
             child: Text(
               '${widget.card.id}',
-              style: const TextStyle(
+              style: TextStyle(
                 color: Colors.white,
-                fontSize: 34,
+                fontSize: widget.isSecondField ? 12 : 34,
               ),
             ),
           ),
@@ -105,26 +109,35 @@ class _GameCardState extends State<GameCard> {
                 child: child,
               ),
               onDragUpdate: (details) => updatePosition(details.localPosition),
-              onDragEnd: (_) => setState(
-                () => positionToOffset(
-                  GameFieldBloc.of(context).swapCardsPositions(
-                    currentOffset: offset,
-                    offsetRadius:
-                        Offset(cardSize + _margin, cardSize + _margin),
-                    card: widget.card,
+              onDragEnd: (_) {
+                setState(
+                  () => positionToOffset(
+                    GameFieldBloc.of(context).swapCardsPositions(
+                      currentOffset: offset,
+                      offsetRadius:
+                          Offset(cardSize + _margin, cardSize + _margin),
+                      card: widget.card,
+                    ),
                   ),
-                ),
-              ),
+                );
+
+                if(!widget.isSecondField && GameFieldBloc.of(context).isAutoStart) {
+                  RoomBloc.of(context).updateMovesLogs(
+                    GameFieldBloc.of(context).generatedCards.value ?? []);
+                }
+              },
               child: child,
             ),
     );
   }
 
   void updatePosition(Offset newPosition) {
-    if(GameFieldBloc.of(context).isGameComplete.value) return;
+    if (GameFieldBloc.of(context).isGameComplete.value) return;
 
-    final screenSize = ScreenDataBloc.of(context).screenSize.value;
-    final fieldSize = ScreenDataBloc.of(context).getFieldSize();
+    final screenSize = ScreenDataBloc.of(context).screenSize.value /
+        (widget.isSecondField ? 2 : 1);
+    final fieldSize = ScreenDataBloc.of(context).getFieldSize() /
+        (widget.isSecondField ? 2 : 1);
 
     /// margin of game field from screen edge
     final marginHeight = (screenSize.height - fieldSize.height) / 2;
@@ -165,7 +178,7 @@ class _GameCardState extends State<GameCard> {
     }
 
     runAfterBuild((_) {
-      if (widget.card.id == -1) {
+      if (widget.card.id == -1 && mounted && !widget.isSecondField) {
         GameFieldBloc.of(context).emptyCardOffset = offset;
       }
     });

@@ -3,6 +3,7 @@ import 'package:beautiful_puzzle/ui/screens/menu/main_menu.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/pvp_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/solo_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room/room_await.screen.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room/room_init.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.init.dart';
 import 'package:beautiful_puzzle/ui/screens/splash.screen.dart';
 import 'package:beautiful_puzzle/ui/widgets/base/dialog.navigator.dart';
@@ -16,15 +17,14 @@ Route<dynamic> generateRoute(RouteSettings settings, BuildContext context) {
       return fadeInPageRoute<dynamic>(const MainMenuScreen());
     case SoloGameScreen.routeName:
       return fadeInPageRoute<dynamic>(const SoloGameScreen());
-    case PvpGameScreen.routeName:
-      return fadeInPageRoute<dynamic>(const PvpGameScreen());
     case LeaderBoardInit.routeName:
       return fadeInPageRoute<dynamic>(const LeaderBoardInit());
     case RoomsListInit.routeName:
       return fadeInPageRoute<dynamic>(const RoomsListInit());
-    case RoomAwaitScreen.routeName:
+    case RoomInitScreen.routeName:
       final args = settings.arguments as RoomArgs;
-      return fadeInPageRoute<dynamic>(RoomAwaitScreen(args: args));
+      return fadeInPageRoute<dynamic>(RoomInitScreen(args: args));
+
     default:
       throw ArgumentError.value(
         settings.name,

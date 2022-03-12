@@ -8,14 +8,14 @@ class PvpGameScreen extends StatelessWidget {
   static const String routeName = '/pvp_game';
 
   static void navigate(BuildContext context) {
-    Navigator.of(context).pushNamed(routeName);
+    Navigator.of(context).pushReplacementNamed(routeName);
   }
 
   @override
   Widget build(BuildContext context) {
     return const Scaffold(
       body: ScreenSize(
-        child: FieldInitializer(),
+        child: FieldInitializer(isAutoStart: true),
       ),
     );
   }

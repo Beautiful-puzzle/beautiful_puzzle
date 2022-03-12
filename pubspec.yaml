@@ -16,6 +16,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   pull_to_refresh: ^2.0.0
   shimmer: ^2.0.0
+  lottie: ^1.2.2
 
   # dev
   rxdart: ^0.27.2

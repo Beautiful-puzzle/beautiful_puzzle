@@ -1,8 +1,10 @@
 import 'package:animated_gesture_detector/animated_gesture_detector.dart';
 import 'package:beautiful_puzzle/models/game_card.dart';
+import 'package:beautiful_puzzle/models/player.dart';
 import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/game/game_card.dart';
 import 'package:beautiful_puzzle/ui/game/game_field.bloc.dart';
+import 'package:beautiful_puzzle/ui/screens/pvp/room/room.bloc.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
 import 'package:beautiful_puzzle/utils/screen.data.dart';
 import 'package:beautiful_puzzle/utils/time.dart';
@@ -89,9 +91,14 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
                   color: ColorsResource.primary,
                   borderRadius: BorderRadius.circular(100.0),
                 ),
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 16, horizontal: 28),
                 child: Text(
-                  isGameStarted ? isGameComplete ? 'Restart' : 'Shuffle' : 'Start game',
+                  isGameStarted
+                      ? isGameComplete
+                          ? 'Restart'
+                          : 'Shuffle'
+                      : 'Start game',
                   style: TextStyle(
                     color: ColorsResource.surface,
                     fontSize: 20,
@@ -121,11 +128,24 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
                   isGameCompleted,
                   const SizedBox(height: 20),
                   elapsedTime,
-                  const SizedBox(height: 20),
-                  shuffleButton,
+                  if (!GameFieldBloc.of(context).isAutoStart) ...[
+                    const SizedBox(height: 20),
+                    shuffleButton,
+                  ],
                 ],
               ),
             ),
+            if (bloc.isAutoStart)
+              Positioned(
+                top: 20,
+                right: 20,
+                child: Container(
+                  color: ColorsResource.secondary,
+                  height: fieldSize.height / 2,
+                  width: fieldSize.width / 2,
+                  child: _secondField(),
+                ),
+              ),
             Center(
               child: Container(
                 color: ColorsResource.secondary,
@@ -135,6 +155,24 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
               ),
             ),
           ],
+        );
+      },
+    );
+  }
+
+  Widget _secondField() {
+    return RxBuilder<Player?>(
+      stream: RoomBloc.of(context).mate,
+      builder: (context, sPlayer) {
+        if (sPlayer.data?.movesLogs == null) {
+          return const SizedBox();
+        }
+
+        return Stack(
+          clipBehavior: Clip.none,
+          children: sPlayer.data!.movesLogs
+              .map((e) => GameCard(card: e, isSecondField: true))
+              .toList(),
         );
       },
     );
