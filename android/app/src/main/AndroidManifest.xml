@@ -1,6 +1,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.khudolii.beautiful_puzzle">
-   <application
+
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
+
+    <application
         android:label="beautiful_puzzle"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">

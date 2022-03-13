@@ -142,8 +142,9 @@ class GameFieldBloc extends Bloc {
     required Offset currentOffset,
     required Offset offsetRadius,
     required GameCardModel card,
+    bool isMateGameComplete = false,
   }) {
-    if(isGameComplete.value) return card.position;
+    if(isGameComplete.value || isMateGameComplete) return card.position;
 
     var movePosition = card.position;
 

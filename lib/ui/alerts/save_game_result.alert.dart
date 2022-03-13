@@ -3,13 +3,15 @@ import 'package:beautiful_puzzle/utils/simple_code.dart';
 import 'package:flutter/material.dart';
 
 class SaveGameResultAlert extends StatefulWidget {
-  const SaveGameResultAlert({Key? key}) : super(key: key);
+  const SaveGameResultAlert({Key? key, this.name}) : super(key: key);
 
-  static Future<dynamic> navigate(BuildContext context) {
+  final String? name;
+
+  static Future<dynamic> navigate(BuildContext context, {String? name}) {
     return dialogNavigate(
       context: context,
       barrierColor: Colors.black.withOpacity(1.0),
-      dialog: const SaveGameResultAlert(),
+      dialog: SaveGameResultAlert(name: name),
       dialogBuilder: (dialog, animation) {
         return SlideTransition(
           position: animation,
@@ -41,16 +43,18 @@ class _SaveGameResultAlertState extends State<SaveGameResultAlert> {
     return Material(
       color: Colors.transparent,
       child: Stack(
-        children: const [
+        children: [
           Positioned(
             bottom: 40,
             right: 20,
             child: SizedBox(
               width: 260,
               child: Text(
-                'You complete the game. Congratulations!',
+                widget.name != null
+                    ? '${widget.name} complete the game.'
+                    : 'You complete the game. Congratulations!',
                 textAlign: TextAlign.right,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 24,
                   color: Colors.white,
                 ),

@@ -24,6 +24,10 @@ class RoomBloc extends Bloc {
       } else {
         _stopTimer();
       }
+
+      _mate.listen((value) {
+        if(value != null) isGameCompleted();
+      });
     });
   }
 
@@ -36,14 +40,14 @@ class RoomBloc extends Bloc {
   final _player = BehaviorSubject<Player?>.seeded(null);
   final _mate = BehaviorSubject<Player?>.seeded(null);
   final _timerValue = BehaviorSubject<int>.seeded(4);
+  final _isMateGameComplete = BehaviorSubject<bool>.seeded(false);
 
   ValueStream<RoomModel?> get roomStream => _room;
 
   ValueStream<Player?> get player => _player;
-
   ValueStream<Player?> get mate => _mate;
-
   ValueStream<int?> get timerValue => _timerValue;
+  ValueStream<bool> get isMateGameComplete => _isMateGameComplete;
 
   void _startTimer() {
     timer = Timer.periodic(const Duration(seconds: 1), (timer) {
@@ -76,6 +80,21 @@ class RoomBloc extends Bloc {
     }
 
     return isReady;
+  }
+
+  void isGameCompleted() {
+    var isCompleted = false;
+    for (final element in _mate.value!.movesLogs) {
+      if (element.id == -1) continue;
+
+      isCompleted = element.id == element.position + 1;
+
+      if (element.id != element.position + 1) break;
+    }
+
+    if (isCompleted != _isMateGameComplete.value) {
+      _isMateGameComplete.add(isCompleted);
+    }
   }
 
   void toggleIsPlayerReady() {
@@ -128,6 +147,7 @@ class RoomBloc extends Bloc {
     _player.close();
     _timerValue.close();
     _mate.close();
+    _isMateGameComplete.close();
 
     super.dispose();
   }

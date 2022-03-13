@@ -45,7 +45,11 @@ class _GameCardState extends State<GameCard> {
       positionToOffset(widget.card.position);
 
       if (!mounted) return;
-      GameFieldBloc.of(context).isGameComplete.listen((isComplete) async {
+      final bloc = widget.isSecondField
+          ? RoomBloc.of(context).isMateGameComplete
+          : GameFieldBloc.of(context).isGameComplete;
+
+      bloc.listen((isComplete) async {
         await Future.delayed(Duration(milliseconds: delayDuration));
 
         if (isComplete) {
@@ -72,7 +76,9 @@ class _GameCardState extends State<GameCard> {
     _margin = ScreenDataBloc.of(context).getMarginSize() /
         (widget.isSecondField ? 2 : 1);
     final child = Container(
-      decoration: BoxDecoration(borderRadius: BorderRadius.circular(widget.isSecondField ? 10.0 : 20.0)),
+      decoration: BoxDecoration(
+          borderRadius:
+              BorderRadius.circular(widget.isSecondField ? 10.0 : 20.0)),
       clipBehavior: Clip.hardEdge,
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 1, sigmaY: 1),
@@ -108,24 +114,34 @@ class _GameCardState extends State<GameCard> {
                 opacity: 1,
                 child: child,
               ),
-              onDragUpdate: (details) => updatePosition(details.localPosition),
-              onDragEnd: (_) {
-                setState(
-                  () => positionToOffset(
-                    GameFieldBloc.of(context).swapCardsPositions(
-                      currentOffset: offset,
-                      offsetRadius:
-                          Offset(cardSize + _margin, cardSize + _margin),
-                      card: widget.card,
-                    ),
-                  ),
-                );
+              onDragUpdate: (details) => widget.isSecondField
+                  ? null
+                  : updatePosition(details.localPosition),
+              onDragEnd: widget.isSecondField
+                  ? null
+                  : (_) {
+                      setState(
+                        () => positionToOffset(
+                          GameFieldBloc.of(context).swapCardsPositions(
+                            currentOffset: offset,
+                            offsetRadius:
+                                Offset(cardSize + _margin, cardSize + _margin),
+                            card: widget.card,
+                            isMateGameComplete: GameFieldBloc.of(context)
+                                    .isAutoStart
+                                ? RoomBloc.of(context).isMateGameComplete.value
+                                : false,
+                          ),
+                        ),
+                      );
 
-                if(!widget.isSecondField && GameFieldBloc.of(context).isAutoStart) {
-                  RoomBloc.of(context).updateMovesLogs(
-                    GameFieldBloc.of(context).generatedCards.value ?? []);
-                }
-              },
+                      if (!widget.isSecondField &&
+                          GameFieldBloc.of(context).isAutoStart) {
+                        RoomBloc.of(context).updateMovesLogs(
+                            GameFieldBloc.of(context).generatedCards.value ??
+                                []);
+                      }
+                    },
               child: child,
             ),
     );
