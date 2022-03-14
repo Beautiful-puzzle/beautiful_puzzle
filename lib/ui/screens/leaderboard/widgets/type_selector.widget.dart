@@ -31,7 +31,9 @@ class _TypeSelectorWidgetState extends State<TypeSelectorWidget> {
                 return Stack(
                   children: [
                     AnimatedPositioned(
-                      left: selectedId == SortBy.time ? constraints.maxWidth * .02 : constraints.maxWidth * .48,
+                      left: selectedId == SortBy.time
+                          ? constraints.maxWidth * .02
+                          : constraints.maxWidth * .48,
                       top: 4,
                       bottom: 4,
                       duration: Dimens.fastDuration,
@@ -52,8 +54,8 @@ class _TypeSelectorWidgetState extends State<TypeSelectorWidget> {
           Row(
             mainAxisSize: MainAxisSize.min,
             children: [
-              _button(id: SortBy.time, text: 'time'),
-              _button(id: SortBy.slides, text: 'slides'),
+              _button(id: SortBy.time, text: ' Time'),
+              _button(id: SortBy.slides, text: ' Slides'),
             ],
           ),
         ],
@@ -74,7 +76,13 @@ class _TypeSelectorWidgetState extends State<TypeSelectorWidget> {
           vertical: 12,
           horizontal: 18,
         ),
-        child: Text(text, textAlign: TextAlign.center,),
+        child: Text(
+          text,
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            fontWeight: FontWeight.w500,
+          ),
+        ),
       ),
     );
   }

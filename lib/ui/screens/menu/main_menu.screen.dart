@@ -25,7 +25,6 @@ class MainMenuScreen extends StatelessWidget {
             Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const Text('mainMenu'),
                 Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [

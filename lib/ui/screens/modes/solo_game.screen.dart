@@ -1,4 +1,5 @@
 import 'package:beautiful_puzzle/ui/game/field/field.initializer.dart';
+import 'package:beautiful_puzzle/ui/widgets/base/scaffold.base.dart';
 import 'package:beautiful_puzzle/ui/widgets/screen_size.widget.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,8 @@ class SoloGameScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const Scaffold(
+    return const ScaffoldBase(
+      extendBodyBehindAppBar: false,
       body: ScreenSize(
         child: FieldInitializer(),
       ),

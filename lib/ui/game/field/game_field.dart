@@ -8,6 +8,7 @@ import 'package:beautiful_puzzle/ui/screens/pvp/room/room.bloc.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
 import 'package:beautiful_puzzle/utils/screen.data.dart';
 import 'package:beautiful_puzzle/utils/time.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class GameFieldWidget extends StatefulWidget {
@@ -43,7 +44,13 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
       builder: (context, sTime) {
         final time = sTime.data ?? 0;
 
-        return Text('Elapsed time: ${ParsedTime.secondsToString(time)}');
+        return Text(
+          'Elapsed time: ${ParsedTime.secondsToString(time)}',
+          style: const TextStyle(
+            fontWeight: FontWeight.w200,
+            fontSize: 18,
+          ),
+        );
       },
     );
 
@@ -52,24 +59,11 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
       builder: (_, sLogs) {
         final count = sLogs.data?.length ?? 0;
         return Text(
-          'Slides count: $count',
+          'Slides: $count',
           style: TextStyle(
             fontSize: 20,
             color: ColorsResource.background,
-          ),
-        );
-      },
-    );
-
-    final isGameCompleted = RxBuilder<bool>(
-      stream: bloc.isGameComplete,
-      builder: (_, sIsComplete) {
-        final isComplete = sIsComplete.data ?? false;
-        return Text(
-          'Is complete: $isComplete',
-          style: TextStyle(
-            fontSize: 20,
-            color: ColorsResource.background,
+            fontWeight: FontWeight.w200,
           ),
         );
       },
@@ -102,6 +96,7 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
                   style: TextStyle(
                     color: ColorsResource.surface,
                     fontSize: 20,
+                    fontWeight: FontWeight.w500,
                   ),
                 ),
               ),
@@ -122,16 +117,12 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
               top: 20,
               left: 20,
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const SizedBox(height: 20),
                   counterText,
-                  const SizedBox(height: 20),
-                  isGameCompleted,
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
                   elapsedTime,
-                  if (!GameFieldBloc.of(context).isAutoStart) ...[
-                    const SizedBox(height: 20),
-                    shuffleButton,
-                  ],
                 ],
               ),
             ),
@@ -147,11 +138,25 @@ class _GameFieldWidgetState extends State<GameFieldWidget> {
                 ),
               ),
             Center(
-              child: Container(
-                color: ColorsResource.secondary,
-                height: fieldSize.height,
-                width: fieldSize.width,
-                child: field,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  if (!GameFieldBloc.of(context).isAutoStart) ...[
+                    const SizedBox(height: 20),
+                    Opacity(
+                        opacity: 0, child: IgnorePointer(child: shuffleButton)),
+                  ],
+                  Container(
+                    color: ColorsResource.secondary,
+                    height: fieldSize.height,
+                    width: fieldSize.width,
+                    child: field,
+                  ),
+                  if (!GameFieldBloc.of(context).isAutoStart) ...[
+                    const SizedBox(height: 20),
+                    shuffleButton,
+                  ],
+                ],
               ),
             ),
           ],

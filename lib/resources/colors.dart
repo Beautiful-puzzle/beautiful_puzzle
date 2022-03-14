@@ -5,7 +5,7 @@ class ColorsResource {
     return Color.lerp(light, dark, 1)!;
   }
 
-  static Color get primary => _dynamicColor(light: const Color(0xFF23CE6B), dark: const Color(0xFF23CE6B));
+  static Color get primary => _dynamicColor(light: const Color(0xFF0080D6), dark: const Color(0xFF50ABDD));
   static Color get secondary => _dynamicColor(light: const Color(0xFFA846A0), dark: const Color(0xFFA846A0));
   static Color get surface => _dynamicColor(light: const Color(0xFFF6F8FF), dark: const Color(0xFFF6F8FF));
   static Color get shade => _dynamicColor(light: const Color(0xFFC9CAD2), dark: const Color(

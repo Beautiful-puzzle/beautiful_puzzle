@@ -3,6 +3,7 @@ import 'package:beautiful_puzzle/repositories/leaderboard/leaderboard.repository
 import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/ui/screens/leaderboard/leaderboard.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
+import 'package:beautiful_puzzle/ui/widgets/base/scaffold.base.dart';
 import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
@@ -25,7 +26,7 @@ class LeaderBoardScreen extends StatelessWidget {
           child: RefreshIndicatorWidget(
             onRefresh: LeaderboardBloc.of(context).updateData,
             child: ListView.builder(
-              itemCount: list.length,
+              itemCount: list.length.clamp(0, 100),
               padding: EdgeInsets.zero,
               physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
@@ -53,7 +54,8 @@ class LeaderBoardScreen extends StatelessWidget {
       },
     );
 
-    return Scaffold(
+    return ScaffoldBase(
+      appbarTitle: "Leaderboard",
       body: Container(
         margin: const EdgeInsets.symmetric(
           vertical: 10,
@@ -65,7 +67,6 @@ class LeaderBoardScreen extends StatelessWidget {
             Column(
               children: [
                 const SizedBox(height: 100),
-                const Text('Leaderboard'),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 10,

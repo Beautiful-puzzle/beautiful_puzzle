@@ -7,6 +7,7 @@ import 'package:beautiful_puzzle/resources/colors.dart';
 import 'package:beautiful_puzzle/resources/dimens.dart';
 import 'package:beautiful_puzzle/ui/screens/modes/pvp_game.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room/room.bloc.dart';
+import 'package:beautiful_puzzle/ui/widgets/base/scaffold.base.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/bloc.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
@@ -91,7 +92,8 @@ class _RoomAwaitScreenState extends State<RoomAwaitScreen> {
 
         return Future.value(true);
       },
-      child: Scaffold(
+      child: ScaffoldBase(
+        appbarTitle: 'Room',
         body: Center(
           child: Stack(
             children: [

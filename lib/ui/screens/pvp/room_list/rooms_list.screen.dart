@@ -5,6 +5,7 @@ import 'package:beautiful_puzzle/ui/screens/pvp/room/room_await.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room/room_init.screen.dart';
 import 'package:beautiful_puzzle/ui/screens/pvp/room_list/rooms_list.bloc.dart';
 import 'package:beautiful_puzzle/ui/widgets/animated_swap.widget.dart';
+import 'package:beautiful_puzzle/ui/widgets/base/scaffold.base.dart';
 import 'package:beautiful_puzzle/ui/widgets/refresh_indicator.widget.dart';
 import 'package:beautiful_puzzle/ui/widgets/shimmer.widget.dart';
 import 'package:beautiful_puzzle/utils/rx_builder.dart';
@@ -38,7 +39,7 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
                 final item = list[index];
                 return _listItem(
                   context,
-                  id: index + 1,
+                  playersCount: item.players.length,
                   name: item.name,
                   onTap: () async {
                     final bloc = RoomsListBloc.of(context);
@@ -71,7 +72,8 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
       },
     );
 
-    return Scaffold(
+    return ScaffoldBase(
+      appbarTitle: "List of rooms",
       body: Container(
         margin: const EdgeInsets.symmetric(
           vertical: 10,
@@ -83,7 +85,6 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
             Column(
               children: [
                 const SizedBox(height: 100),
-                const Text('Leaderboard'),
                 Container(
                   padding: const EdgeInsets.symmetric(
                     vertical: 10,
@@ -98,16 +99,12 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
                   child: Row(
                     children: [
                       Expanded(
-                        flex: 1,
-                        child: _titleText(text: 'Place'),
-                      ),
-                      Expanded(
                         flex: 3,
-                        child: _titleText(text: 'Name'),
+                        child: _titleText(text: 'Room'),
                       ),
                       Expanded(
                         flex: 1,
-                        child: _titleText(text: 'Time'),
+                        child: _titleText(text: 'Players/All'),
                       ),
                     ],
                   ),
@@ -151,8 +148,8 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
             color: ColorsResource.primary,
             borderRadius: BorderRadius.circular(100.0),
           ),
-          padding: EdgeInsets.all(20),
-          child: Icon(Icons.add),
+          padding: const EdgeInsets.all(17),
+          child: const Icon(Icons.add, color: Colors.white),
         ),
       ),
     );
@@ -170,7 +167,7 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
 
   Widget _listItem(
     BuildContext context, {
-    int? id,
+    int? playersCount,
     String? name,
     VoidCallback? onTap,
   }) {
@@ -191,14 +188,14 @@ class _RoomsListScreenState extends State<RoomsListScreen> {
         ),
         child: Row(
           children: [
-            Expanded(flex: 1, child: Text('$id')),
             Expanded(flex: 3, child: Text('$name')),
+            Expanded(flex: 1, child: Text('$playersCount/2')),
           ],
         ),
       ),
     );
 
-    if (id == null || name == null) {
+    if (playersCount == null || name == null) {
       return ShimmerWidget(
         child: Container(
           decoration: BoxDecoration(
